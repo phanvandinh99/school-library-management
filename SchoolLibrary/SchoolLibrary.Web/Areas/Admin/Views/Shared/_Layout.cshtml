@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý Thư viện Trường THPT</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .sidebar {
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar .sidebar-brand {
+            padding: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            padding-left: 30px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .topbar {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .content-box {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            📚 Quản lý Thư viện
+        </div>
+        <nav class="flex-column">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" 
+               asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">
+                🏠 Dashboard
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserManagement" ? "active" : "")" 
+               asp-area="Admin" asp-controller="UserManagement" asp-action="Index">
+                👥 Quản lý Người dùng
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "SystemConfiguration" ? "active" : "")" 
+               asp-area="Admin" asp-controller="SystemConfiguration" asp-action="Index">
+                ⚙️ Cấu hình Hệ thống
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "ActivityMonitor" ? "active" : "")" 
+               asp-area="Admin" asp-controller="ActivityMonitor" asp-action="Index">
+                📊 Giám sát Hoạt động
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reports" ? "active" : "")" 
+               asp-area="Admin" asp-controller="Reports" asp-action="Index">
+                📈 Báo cáo & Thống kê
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Backup" ? "active" : "")" 
+               asp-area="Admin" asp-controller="Backup" asp-action="Index">
+                💾 Sao lưu & Phục hồi
+            </a>
+        </nav>
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 20px;">
+            <div class="text-white mb-3" style="font-size: 14px;">
+                <strong>@Context.Session.GetString("FullName")</strong><br>
+                <small>@Context.Session.GetString("Username")</small>
+            </div>
+            <form asp-area="Admin" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                <button type="submit" class="btn btn-light btn-sm w-100">🚪 Đăng xuất</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>✓ Thành công!</strong> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>✗ Lỗi!</strong> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

@@ -1,0 +1,75 @@
+@model SchoolLibrary.Web.Models.ViewModels.UserViewModel
+@{
+    ViewData["Title"] = "Sửa Người dùng";
+}
+
+<h2>Sửa thông tin Người dùng</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            <input asp-for="UserID" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Mật khẩu mới</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Để trống nếu không đổi" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <small class="text-muted">Chỉ điền khi muốn đổi mật khẩu</small>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RoleID" class="form-label"></label>
+                <select asp-for="RoleID" asp-items="ViewBag.Roles" class="form-control">
+                    <option value="">-- Chọn vai trò --</option>
+                </select>
+                <span asp-validation-for="RoleID" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ClassOrDepartment" class="form-label"></label>
+                <input asp-for="ClassOrDepartment" class="form-control" />
+                <span asp-validation-for="ClassOrDepartment" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" type="email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

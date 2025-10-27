@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Báo cáo Năm";
+}
+
+<div class="content-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📆 Báo cáo Năm @ViewBag.Year</h2>
+        <div>
+            <form asp-action="YearlyReport" method="get" class="d-inline">
+                <select name="year" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                    @for (int y = DateTime.Now.Year; y >= DateTime.Now.Year - 5; y--)
+                    {
+                        <option value="@y" selected="@(y == ViewBag.Year)">Năm @y</option>
+                    }
+                </select>
+            </form>
+            <a asp-action="Index" class="btn btn-secondary">← Quay lại</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@ViewBag.Borrows.Count</h3>
+                    <p class="mb-0">Tổng lượt mượn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Statistics -->
+    <div class="card">
+        <div class="card-header">
+            <h5>📊 Thống kê theo Tháng</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Tháng</th>
+                            <th>Lượt mượn</th>
+                            <th>Lượt trả</th>
+                            <th>Đang mượn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stat in ViewBag.MonthlyStats)
+                        {
+                            <tr>
+                                <td><strong>Tháng @stat.Month</strong></td>
+                                <td><span class="badge bg-primary">@stat.Borrows</span></td>
+                                <td><span class="badge bg-success">@stat.Returns</span></td>
+                                <td>@(stat.Borrows - stat.Returns)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

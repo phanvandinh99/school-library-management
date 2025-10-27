@@ -7,27 +7,57 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Admin\Data\**" />
+    <Compile Remove="Areas\Admin\Models\**" />
+    <Compile Remove="Areas\Librarian\Data\**" />
+    <Compile Remove="Areas\Librarian\Models\**" />
+    <Compile Remove="Areas\Student\Data\**" />
+    <Compile Remove="Areas\Student\Models\**" />
+    <Compile Remove="Areas\Teacher\Data\**" />
+    <Compile Remove="Areas\Teacher\Models\**" />
+    <Content Remove="Areas\Admin\Data\**" />
+    <Content Remove="Areas\Admin\Models\**" />
+    <Content Remove="Areas\Librarian\Data\**" />
+    <Content Remove="Areas\Librarian\Models\**" />
+    <Content Remove="Areas\Student\Data\**" />
+    <Content Remove="Areas\Student\Models\**" />
+    <Content Remove="Areas\Teacher\Data\**" />
+    <Content Remove="Areas\Teacher\Models\**" />
+    <EmbeddedResource Remove="Areas\Admin\Data\**" />
+    <EmbeddedResource Remove="Areas\Admin\Models\**" />
+    <EmbeddedResource Remove="Areas\Librarian\Data\**" />
+    <EmbeddedResource Remove="Areas\Librarian\Models\**" />
+    <EmbeddedResource Remove="Areas\Student\Data\**" />
+    <EmbeddedResource Remove="Areas\Student\Models\**" />
+    <EmbeddedResource Remove="Areas\Teacher\Data\**" />
+    <EmbeddedResource Remove="Areas\Teacher\Models\**" />
+    <None Remove="Areas\Admin\Data\**" />
+    <None Remove="Areas\Admin\Models\**" />
+    <None Remove="Areas\Librarian\Data\**" />
+    <None Remove="Areas\Librarian\Models\**" />
+    <None Remove="Areas\Student\Data\**" />
+    <None Remove="Areas\Student\Models\**" />
+    <None Remove="Areas\Teacher\Data\**" />
+    <None Remove="Areas\Teacher\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Areas\" />
     <Folder Include="Areas\Admin\Controllers\" />
-    <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Admin\Views\" />
     <Folder Include="Areas\Librarian\Controllers\" />
-    <Folder Include="Areas\Librarian\Data\" />
-    <Folder Include="Areas\Librarian\Models\" />
     <Folder Include="Areas\Librarian\Views\" />
     <Folder Include="Areas\Student\Controllers\" />
-    <Folder Include="Areas\Student\Data\" />
-    <Folder Include="Areas\Student\Models\" />
     <Folder Include="Areas\Student\Views\" />
     <Folder Include="Areas\Teacher\Controllers\" />
-    <Folder Include="Areas\Teacher\Data\" />
-    <Folder Include="Areas\Teacher\Models\" />
     <Folder Include="Areas\Teacher\Views\" />
     <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 

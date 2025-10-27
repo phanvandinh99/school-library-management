@@ -1,0 +1,78 @@
+@model SchoolLibrary.Web.Models.ViewModels.SystemSettingsViewModel
+@{
+    ViewData["Title"] = "Cấu hình Hệ thống";
+}
+
+<div class="content-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">⚙️ Cấu hình Hệ thống</h2>
+        <a asp-action="ResetDefaults" class="btn btn-warning" onclick="return confirm('Bạn có chắc muốn reset về cấu hình mặc định?');">
+            🔄 Reset về Mặc định
+        </a>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>💡 Lưu ý:</strong> Các thay đổi sẽ ảnh hưởng đến toàn bộ hệ thống. Vui lòng kiểm tra kỹ trước khi lưu.
+    </div>
+
+    <form asp-action="UpdateSettings" method="post" class="mt-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            @for (int i = 0; i < Model.Settings.Count; i++)
+            {
+                var setting = Model.Settings[i];
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <strong>@setting.SettingKey</strong>
+                            @if (!string.IsNullOrEmpty(setting.SettingType))
+                            {
+                                <span class="badge bg-secondary float-end">@setting.SettingType</span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" asp-for="Settings[i].SettingID" />
+                            <input type="hidden" asp-for="Settings[i].SettingKey" />
+                            <input type="hidden" asp-for="Settings[i].SettingType" />
+                            
+                            <label class="form-label">@setting.Description</label>
+                            
+                            @if (setting.SettingType == "Integer" || setting.SettingType == "Decimal")
+                            {
+                                <input asp-for="Settings[i].SettingValue" class="form-control" type="number" />
+                            }
+                            else if (setting.SettingType == "Boolean")
+                            {
+                                <select asp-for="Settings[i].SettingValue" class="form-select">
+                                    <option value="true">Có</option>
+                                    <option value="false">Không</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <input asp-for="Settings[i].SettingValue" class="form-control" type="text" />
+                            }
+                            
+                            <input type="hidden" asp-for="Settings[i].Description" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                💾 Lưu Cấu hình
+            </button>
+            <a asp-area="Admin" asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary btn-lg">
+                ↩️ Quay lại
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

@@ -1,0 +1,148 @@
+@{
+    ViewData["Title"] = "Sao lưu & Phục hồi";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">💾 Sao lưu & Phục hồi Dữ liệu</h2>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Cảnh báo:</strong> Chức năng phục hồi sẽ xóa toàn bộ dữ liệu hiện tại và thay thế bằng dữ liệu từ file backup. Vui lòng sao lưu trước khi phục hồi!
+    </div>
+
+    <div class="row">
+        <!-- Create Backup -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">📥 Tạo Sao lưu</h5>
+                </div>
+                <div class="card-body">
+                    <p>Tạo file sao lưu toàn bộ dữ liệu hệ thống dưới dạng JSON.</p>
+                    <form id="createBackupForm">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            💾 Tạo Sao lưu Ngay
+                        </button>
+                    </form>
+                    <div id="backupResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restore Backup -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">📤 Phục hồi Dữ liệu</h5>
+                </div>
+                <div class="card-body">
+                    <p>Phục hồi dữ liệu từ file backup đã tạo trước đó.</p>
+                    <div id="backupFiles">
+                        <p class="text-muted">Đang tải danh sách...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List Backups -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>📋 Danh sách File Sao lưu</h5>
+        </div>
+        <div class="card-body">
+            <div id="backupList" class="table-responsive">
+                <p class="text-center text-muted">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load backup files on page load
+        $(document).ready(function() {
+            loadBackupFiles();
+        });
+
+        // Create backup
+        $('#createBackupForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '@Url.Action("CreateBackup", "Backup")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        $('#backupResult').html('<div class="alert alert-success">' + response.message + '</div>');
+                        loadBackupFiles();
+                    } else {
+                        $('#backupResult').html('<div class="alert alert-danger">' + response.message + '</div>');
+                    }
+                },
+                error: function() {
+                    $('#backupResult').html('<div class="alert alert-danger">Lỗi khi tạo sao lưu!</div>');
+                }
+            });
+        });
+
+        // Load backup files
+        function loadBackupFiles() {
+            $.get('@Url.Action("ListBackups", "Backup")', function(data) {
+                var html = '';
+                
+                if (data.length === 0) {
+                    html = '<p class="text-muted text-center">Chưa có file sao lưu nào.</p>';
+                } else {
+                    html = '<table class="table table-striped"><thead><tr><th>Tên file</th><th>Kích thước</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead><tbody>';
+                    
+                    data.forEach(function(file) {
+                        var sizeKB = (file.size / 1024).toFixed(2);
+                        var date = new Date(file.createdDate).toLocaleString('vi-VN');
+                        
+                        html += '<tr><td>' + file.fileName + '</td>';
+                        html += '<td>' + sizeKB + ' KB</td>';
+                        html += '<td>' + date + '</td>';
+                        html += '<td>';
+                        html += '<button class="btn btn-sm btn-primary" onclick="downloadBackup(\'' + file.fileName + '\')">📥 Tải</button> ';
+                        html += '<button class="btn btn-sm btn-danger" onclick="restoreBackup(\'' + file.fileName + '\')">⚠️ Phục hồi</button>';
+                        html += '</td></tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                }
+                
+                $('#backupList').html(html);
+            });
+        }
+
+        // Download backup
+        function downloadBackup(fileName) {
+            window.location.href = '@Url.Action("DownloadBackup", "Backup")?fileName=' + fileName;
+        }
+
+        // Restore backup
+        function restoreBackup(fileName) {
+            if (!confirm('⚠️ CẢNH BÁO: Bạn có chắc muốn phục hồi dữ liệu từ file "' + fileName + '"?\n\nToàn bộ dữ liệu hiện tại sẽ bị xóa!')) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("RestoreBackup", "Backup")',
+                type: 'POST',
+                data: { fileName: fileName },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Phục hồi thành công! Trang sẽ được tải lại.');
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Lỗi khi phục hồi!');
+                }
+            });
+        }
+    </script>
+}
+
