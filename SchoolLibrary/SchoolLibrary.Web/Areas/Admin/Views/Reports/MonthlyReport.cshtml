@@ -1,0 +1,98 @@
+@{
+    ViewData["Title"] = "Báo cáo Tháng";
+}
+
+<div class="content-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📅 Báo cáo Tháng @ViewBag.Month/@ViewBag.Year</h2>
+        <div>
+            <form asp-action="MonthlyReport" method="get" class="d-inline">
+                <select name="year" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                    @for (int y = DateTime.Now.Year; y >= DateTime.Now.Year - 3; y--)
+                    {
+                        <option value="@y" selected="@(y == ViewBag.Year)">@y</option>
+                    }
+                </select>
+                <select name="month" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        <option value="@m" selected="@(m == ViewBag.Month)">Tháng @m</option>
+                    }
+                </select>
+            </form>
+            <a asp-action="Index" class="btn btn-secondary">← Quay lại</a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@ViewBag.Borrows.Count</h3>
+                    <p class="mb-0">Tổng lượt mượn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@ViewBag.Returns.Count</h3>
+                    <p class="mb-0">Tổng lượt trả</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    @* <h3 class="text-warning">@ViewBag.Borrows.Count(x => !x.IsReturned)</h3> *@
+                    <p class="mb-0">Đang mượn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    @* <h3 class="text-info">@ViewBag.Borrows.Count(x => x.IsReturned && x.FineAmount > 0)</h3> *@
+                    <p class="mb-0">Có phạt</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    <div class="card">
+        <div class="card-header">
+            <h5>👥 Top 20 Người dùng Hoạt động</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Vai trò</th>
+                            <th>Số lần mượn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{int idx = 1;}
+                        @foreach (var user in ViewBag.UserActivity)
+                        {
+                            <tr>
+                                <td>@idx</td>
+                                <td>@user.UserName</td>
+                                <td><span class="badge bg-primary">@user.Role</span></td>
+                                <td><span class="badge bg-success">@user.BorrowCount lần</span></td>
+                            </tr>
+                            idx++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

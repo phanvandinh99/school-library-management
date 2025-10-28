@@ -1,0 +1,118 @@
+@{
+    ViewData["Title"] = "Báo cáo Tuần";
+    var borrows = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.Borrows;
+    var returns = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.Returns;
+    var mostBorrowed = (dynamic)ViewBag.MostBorrowedBooks;
+}
+
+<div class="content-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📊 Báo cáo Tuần: @ViewBag.WeekStart - @ViewBag.WeekEnd</h2>
+        <a asp-action="Index" class="btn btn-secondary">← Quay lại</a>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@borrows.Count</h3>
+                    <p class="mb-0">Lượt mượn sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@returns.Count</h3>
+                    <p class="mb-0">Lượt trả sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@borrows.Count(x => !x.IsReturned)</h3>
+                    <p class="mb-0">Đang mượn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Borrowed Books -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>🔥 Sách được mượn nhiều nhất trong tuần</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên sách</th>
+                            <th>Số lần mượn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{int idx = 1;}
+                        @foreach (var item in mostBorrowed)
+                        {
+                            <tr>
+                                <td>@idx</td>
+                                <td>@item.BookTitle</td>
+                                <td><span class="badge bg-primary">@item.Count lần</span></td>
+                            </tr>
+                            idx++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Borrows -->
+    <div class="card">
+        <div class="card-header">
+            <h5>📚 Chi tiết Mượn Sách</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Người mượn</th>
+                            <th>Sách</th>
+                            <th>Hạn trả</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in borrows)
+                        {
+                            <tr>
+                                <td>@record.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                <td>@record.User?.FullName</td>
+                                <td>@record.BookCopy?.Book?.Title</td>
+                                <td>@record.DueDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (record.IsReturned)
+                                    {
+                                        <span class="badge bg-success">Đã trả</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Đang mượn</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

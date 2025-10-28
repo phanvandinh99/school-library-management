@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Báo cáo & Thống kê";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📈 Báo cáo & Thống kê</h2>
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h1 class="display-4 text-primary">📊</h1>
+                    <h5 class="card-title">Báo cáo Tuần</h5>
+                    <p class="card-text">Thống kê hoạt động trong tuần này</p>
+                    <a asp-action="WeeklyReport" class="btn btn-primary">Xem báo cáo</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h1 class="display-4 text-info">📅</h1>
+                    <h5 class="card-title">Báo cáo Tháng</h5>
+                    <p class="card-text">Thống kê hoạt động theo tháng</p>
+                    <a asp-action="MonthlyReport" class="btn btn-info">Xem báo cáo</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h1 class="display-4 text-success">📆</h1>
+                    <h5 class="card-title">Báo cáo Năm</h5>
+                    <p class="card-text">Thống kê tổng quan theo năm</p>
+                    <a asp-action="YearlyReport" class="btn btn-success">Xem báo cáo</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h1 class="display-4 text-warning">📋</h1>
+                    <h5 class="card-title">Tổng quan</h5>
+                    <p class="card-text">Thống kê tổng hợp hệ thống</p>
+                    <a asp-action="StatisticsSummary" class="btn btn-warning">Xem tổng quan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

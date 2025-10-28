@@ -1,0 +1,133 @@
+@{
+    ViewData["Title"] = "Giám sát Hoạt động";
+    var statistics = (dynamic)ViewBag.Statistics;
+    var recentBorrows = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.RecentBorrows;
+    var overdueBooks = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.OverdueBooks;
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📊 Giám sát Hoạt động Hệ thống</h2>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="text-primary">Hôm nay</h5>
+                    <h2 class="text-primary">@statistics.TotalBorrowsToday</h2>
+                    <small class="text-muted">Mượn sách</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h5 class="text-info">Trả hôm nay</h5>
+                    <h2 class="text-info">@statistics.ReturnedToday</h2>
+                    <small class="text-muted">Trả sách</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="text-warning">Tuần này</h5>
+                    <h2 class="text-warning">@statistics.TotalBorrowsThisWeek</h2>
+                    <small class="text-muted">Lượt mượn</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="text-success">Tháng này</h5>
+                    <h2 class="text-success">@statistics.TotalBorrowsThisMonth</h2>
+                    <small class="text-muted">Lượt mượn</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h5 class="text-danger">Quá hạn</h5>
+                    <h2 class="text-danger">@statistics.OverdueCount</h2>
+                    <small class="text-muted">Sách quá hạn</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <h5 class="text-secondary">Hôm nay</h5>
+                    <h2 class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy")</h2>
+                    <small class="text-muted">Ngày hiện tại</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Books Alert -->
+    @if (overdueBooks.Any())
+    {
+        <div class="alert alert-danger">
+            <h5>⚠️ Cảnh báo: Có @overdueBooks.Count sách quá hạn chưa trả!</h5>
+            <a asp-action="OverdueBooks" class="btn btn-sm btn-danger">Xem chi tiết</a>
+        </div>
+    }
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📋 Hoạt động Mượn Sách Gần Đây</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ngày mượn</th>
+                                    <th>Người mượn</th>
+                                    <th>Tên sách</th>
+                                    <th>Hạn trả</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var record in recentBorrows.Take(20))
+                                {
+                                    var isOverdue = !record.IsReturned && record.DueDate < DateTime.Now.Date;
+                                    <tr class="@(isOverdue ? "table-danger" : "")">
+                                        <td>@record.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@record.User?.FullName</td>
+                                        <td>@record.BookCopy?.Book?.Title</td>
+                                        <td>
+                                            @record.DueDate.ToString("dd/MM/yyyy")
+                                            @if (isOverdue)
+                                            {
+                                                <span class="badge bg-danger">Quá hạn</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (record.IsReturned && record.ReturnDate.HasValue)
+                                            {
+                                                <span class="badge bg-success">Đã trả</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Đang mượn</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
