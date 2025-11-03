@@ -45,7 +45,7 @@
         <div class="col-md-3">
             <div class="card border-warning">
                 <div class="card-body text-center">
-                    <h3 class="text-warning">@ViewBag.Borrows.Count(x => !x.IsReturned)</h3>
+                    <h3 class="text-warning">@(((IEnumerable<BorrowRecord>)ViewBag.Borrows).Count(x => !x.IsReturned))</h3>
                     <p class="mb-0">Đang mượn</p>
                 </div>
             </div>
@@ -53,7 +53,7 @@
         <div class="col-md-3">
             <div class="card border-info">
                 <div class="card-body text-center">
-                    <h3 class="text-info">@ViewBag.Borrows.Count(x => x.IsReturned && x.FineAmount > 0)</h3>
+                    <h3 class="text-info">@(((IEnumerable<BorrowRecord>)ViewBag.Borrows).Count(x => x.IsReturned && x.FineAmount > 0))</h3>
                     <p class="mb-0">Có phạt</p>
                 </div>
             </div>

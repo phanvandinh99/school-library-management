@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using SchoolLibrary.Web.Data;
+using SchoolLibrary.Web.Models;
 
 namespace SchoolLibrary.Web.Areas.Admin.Controllers
 {
