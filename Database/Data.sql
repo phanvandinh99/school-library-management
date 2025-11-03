@@ -86,6 +86,17 @@ CREATE TABLE BorrowRecords (
     FOREIGN KEY (CopyID) REFERENCES BookCopies(CopyID)
 );
 
+-- Bảng SystemSettings
+CREATE TABLE [dbo].[SystemSettings] (
+    [SettingID] INT PRIMARY KEY IDENTITY(1,1),
+    [SettingKey] NVARCHAR(100) NOT NULL UNIQUE,
+    [SettingValue] NVARCHAR(500) NULL,
+    [Description] NVARCHAR(200) NULL,
+    [SettingType] NVARCHAR(100) NULL,
+    [LastModified] DATETIME NULL
+);
+GO
+
 -- ========== NHẬP DỮ LIỆU ========== --
 -- Chèn vai trò
 INSERT INTO Roles (RoleName) VALUES 
@@ -96,10 +107,10 @@ INSERT INTO Roles (RoleName) VALUES
 
 -- Người dùng mẫu
 INSERT INTO Users (FullName, Username, PasswordHash, RoleID, ClassOrDepartment, Email, Phone) VALUES
-(N'Phan Văn A', 'phana', 'Abc123456@', 1, '11A1', 'phana@school.edu.vn', '0901234567'),
-(N'Nguyễn Thị B', 'nguyenb', 'Abc123456@', 2, N'Toán', 'nguyenb@school.edu.vn', '0912345678'),
-(N'Trần Văn Thư', 'thuthu', 'Abc123456@', 3, NULL, 'librarian@school.edu.vn', '0987654321'),
-(N'Admin Hệ thống', 'admin', 'Abc123456@', 4, NULL, 'admin@school.edu.vn', NULL);
+(N'Phan Văn A', 'phana', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 1, '11A1', 'phana@school.edu.vn', '0901234567'),
+(N'Nguyễn Thị B', 'nguyenb', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 2, N'Toán', 'nguyenb@school.edu.vn', '0912345678'),
+(N'Trần Văn Thư', 'thuthu', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 3, NULL, 'librarian@school.edu.vn', '0987654321'),
+(N'Admin Hệ thống', 'admin', '5LBD09ejx3LVQ5gDLiGWMMc2j0+5HYQoLvaEl5NZ5/Q=', 4, NULL, 'admin@school.edu.vn', NULL);
 
 -- Thể loại
 INSERT INTO Categories (CategoryName) VALUES
@@ -131,39 +142,14 @@ INSERT INTO BorrowRecords (UserID, CopyID, BorrowDate, DueDate, ReturnDate, IsRe
 (2, 4, '2025-10-01', '2025-10-15', '2025-10-14', 1, 0); -- Đã trả
 GO
 
--- ===== (2) AddSystemSettingsTable.sql =====
--- Script thêm bảng SystemSettings vào database
-
-USE LibraryTHPT;
-GO
-
--- Tạo bảng SystemSettings nếu chưa tồn tại
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SystemSettings]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[SystemSettings] (
-        [SettingID] INT PRIMARY KEY IDENTITY(1,1),
-        [SettingKey] NVARCHAR(100) NOT NULL UNIQUE,
-        [SettingValue] NVARCHAR(500),
-        [Description] NVARCHAR(200),
-        [SettingType] NVARCHAR(100),
-        [LastModified] DATETIME
-    );
-
-    -- Chèn dữ liệu mặc định
-    INSERT INTO SystemSettings (SettingKey, SettingValue, Description, SettingType, LastModified)
-    VALUES
-    (N'DefaultBorrowDays', '14', N'Số ngày mượn mặc định', 'Integer', GETDATE()),
-    (N'MaxRenewDays', '7', N'Số ngày gia hạn tối đa', 'Integer', GETDATE()),
-    (N'FinePerDay', '5000', N'Tiền phạt mỗi ngày trễ hạn (VNĐ)', 'Integer', GETDATE()),
-    (N'MaxBorrowBooks', '5', N'Số sách mượn tối đa mỗi người', 'Integer', GETDATE()),
-    (N'GracePeriod', '3', N'Số ngày gia hạn không phạt', 'Integer', GETDATE()),
-    (N'SystemName', N'Thư viện Trường THPT', N'Tên hệ thống', 'String', GETDATE()),
-    (N'LateNotificationDays', '3', N'Nhắc nhở trước khi hết hạn (ngày)', 'Integer', GETDATE());
-
-    PRINT 'Đã tạo bảng SystemSettings và chèn dữ liệu mặc định!';
-END
-ELSE
-BEGIN
-    PRINT 'Bảng SystemSettings đã tồn tại.';
-END
+-- Insert dữ liệu mặc định
+INSERT INTO SystemSettings (SettingKey, SettingValue, Description, SettingType, LastModified)
+VALUES
+(N'DefaultBorrowDays', '14', N'Số ngày mượn mặc định', 'Integer', GETDATE()),
+(N'MaxRenewDays', '7', N'Số ngày gia hạn tối đa', 'Integer', GETDATE()),
+(N'FinePerDay', '5000', N'Tiền phạt mỗi ngày trễ hạn (VNĐ)', 'Integer', GETDATE()),
+(N'MaxBorrowBooks', '5', N'Số sách mượn tối đa mỗi người', 'Integer', GETDATE()),
+(N'GracePeriod', '3', N'Số ngày gia hạn không phạt', 'Integer', GETDATE()),
+(N'SystemName', N'Thư viện Trường THPT', N'Tên hệ thống', 'String', GETDATE()),
+(N'LateNotificationDays', '3', N'Nhắc nhở trước khi hết hạn (ngày)', 'Integer', GETDATE());
 GO
