@@ -110,7 +110,7 @@ INSERT INTO Users (FullName, Username, PasswordHash, RoleID, ClassOrDepartment, 
 (N'Phan Văn A', 'phana', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 1, '11A1', 'phana@school.edu.vn', '0901234567'),
 (N'Nguyễn Thị B', 'nguyenb', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 2, N'Toán', 'nguyenb@school.edu.vn', '0912345678'),
 (N'Trần Văn Thư', 'thuthu', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 3, NULL, 'librarian@school.edu.vn', '0987654321'),
-(N'Admin Hệ thống', 'admin', '5LBD09ejx3LVQ5gDLiGWMMc2j0+5HYQoLvaEl5NZ5/Q=', 4, NULL, 'admin@school.edu.vn', NULL);
+(N'Admin Hệ thống', 'admin', 'RNuUoxlFpLzHh0ICDUCxGazq95emqPjGUGVskxvxN10=', 4, NULL, 'admin@school.edu.vn', NULL);
 
 -- Thể loại
 INSERT INTO Categories (CategoryName) VALUES

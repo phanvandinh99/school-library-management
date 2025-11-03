@@ -7,7 +7,6 @@ using SchoolLibrary.Web.Models;
 namespace SchoolLibrary.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
     public class BackupController : Controller
     {
         private readonly LibraryDbContext _context;

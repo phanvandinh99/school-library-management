@@ -10,7 +10,6 @@ using SchoolLibrary.Web.Services;
 namespace SchoolLibrary.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
     public class UserManagementController : Controller
     {
         private readonly LibraryDbContext _context;

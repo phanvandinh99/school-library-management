@@ -33,9 +33,12 @@ namespace SchoolLibrary.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
+            // Normalize username to avoid leading/trailing whitespace issues
+            var normalizedUsername = (model.Username ?? string.Empty).Trim();
+
             var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Username == model.Username && u.IsActive);
+                .FirstOrDefaultAsync(u => u.Username == normalizedUsername && u.IsActive);
 
             if (user == null || !HashService.VerifyPassword(model.Password, user.PasswordHash))
             {

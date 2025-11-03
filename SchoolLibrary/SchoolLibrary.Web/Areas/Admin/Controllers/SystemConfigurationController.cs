@@ -8,7 +8,6 @@ using SchoolLibrary.Web.Models.ViewModels;
 namespace SchoolLibrary.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
     public class SystemConfigurationController : Controller
     {
         private readonly LibraryDbContext _context;
