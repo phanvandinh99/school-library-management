@@ -76,6 +76,16 @@ CREATE TABLE BorrowRecords (
     FOREIGN KEY (CopyID) REFERENCES BookCopies(CopyID)
 );
 
+-- Bảng cấu hình hệ thống
+CREATE TABLE SystemSettings (
+    SettingID INT PRIMARY KEY IDENTITY(1,1),
+    SettingKey NVARCHAR(100) NOT NULL UNIQUE,
+    SettingValue NVARCHAR(500),
+    Description NVARCHAR(200),
+    SettingType NVARCHAR(100), -- 'Integer', 'String', 'Boolean', 'Decimal'
+    LastModified DATETIME
+);
+
 -- ========== NHẬP DỮ LIỆU ========== --
 -- Chèn vai trò
 INSERT INTO Roles (RoleName) VALUES 
@@ -119,3 +129,13 @@ INSERT INTO BookCopies (BookID, CopyCode, Status) VALUES
 INSERT INTO BorrowRecords (UserID, CopyID, BorrowDate, DueDate, ReturnDate, IsReturned, FineAmount) VALUES
 (1, 2, '2025-10-10', '2025-10-24', NULL, 0, 0), -- Chưa trả
 (2, 4, '2025-10-01', '2025-10-15', '2025-10-14', 1, 0); -- Đã trả
+
+-- Cấu hình hệ thống mặc định
+INSERT INTO SystemSettings (SettingKey, SettingValue, Description, SettingType, LastModified) VALUES
+(N'DefaultBorrowDays', '14', N'Số ngày mượn mặc định', 'Integer', GETDATE()),
+(N'MaxRenewDays', '7', N'Số ngày gia hạn tối đa', 'Integer', GETDATE()),
+(N'FinePerDay', '5000', N'Tiền phạt mỗi ngày trễ hạn (VNĐ)', 'Integer', GETDATE()),
+(N'MaxBorrowBooks', '5', N'Số sách mượn tối đa mỗi người', 'Integer', GETDATE()),
+(N'GracePeriod', '3', N'Số ngày gia hạn không phạt', 'Integer', GETDATE()),
+(N'SystemName', N'Thư viện Trường THPT', N'Tên hệ thống', 'String', GETDATE()),
+(N'LateNotificationDays', '3', N'Nhắc nhở trước khi hết hạn (ngày)', 'Integer', GETDATE());
