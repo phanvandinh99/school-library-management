@@ -1,0 +1,124 @@
+@model SchoolLibrary.Web.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">🏠 Dashboard - Thủ thư</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h1 class="text-primary">@Model.TotalUsers</h1>
+                    <p class="mb-0">Tổng người dùng</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h1 class="text-success">@Model.TotalBooks</h1>
+                    <p class="mb-0">Tổng sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h1 class="text-warning">@Model.TotalBorrowedBooks</h1>
+                    <p class="mb-0">Sách đang mượn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h1 class="text-info">@Model.TotalCategories</h1>
+                    <p class="mb-0">Thể loại</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@Model.ActiveUsers</h3>
+                    <p class="mb-0">Người dùng hoạt động</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h3 class="text-danger">@Model.InactiveUsers</h3>
+                    <p class="mb-0">Người dùng không hoạt động</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy")</h3>
+                    <p class="mb-0">Hôm nay</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.RecentBorrows != null && Model.RecentBorrows.Any())
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📚 Mượn sách gần đây</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Ngày mượn</th>
+                                        <th>Người mượn</th>
+                                        <th>Sách</th>
+                                        <th>Hạn trả</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var borrow in Model.RecentBorrows.Take(10))
+                                    {
+                                        <tr>
+                                            <td>@borrow.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@borrow.User?.FullName</td>
+                                            <td>@borrow.BookCopy?.Book?.Title</td>
+                                            <td>@borrow.DueDate.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @if (borrow.IsReturned)
+                                                {
+                                                    <span class="badge bg-success">Đã trả</span>
+                                                }
+                                                else if (borrow.DueDate < DateTime.Now.Date)
+                                                {
+                                                    <span class="badge bg-danger">Quá hạn</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Đang mượn</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

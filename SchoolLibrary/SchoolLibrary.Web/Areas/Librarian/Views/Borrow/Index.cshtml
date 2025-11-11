@@ -1,0 +1,92 @@
+@model IEnumerable<SchoolLibrary.Web.Models.BorrowRecord>
+@{
+    ViewData["Title"] = "Mượn/Trả Sách";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📋 Mượn/Trả Sách</h2>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <a asp-action="Borrow" class="btn btn-success">
+            ➕ Mượn sách mới
+        </a>
+        <div>
+            <a asp-action="Index" asp-route-status="" class="btn btn-sm @(ViewBag.Status == null ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
+            <a asp-action="Index" asp-route-status="active" class="btn btn-sm @(ViewBag.Status == "active" ? "btn-primary" : "btn-outline-primary")">Đang mượn</a>
+            <a asp-action="Index" asp-route-status="returned" class="btn btn-sm @(ViewBag.Status == "returned" ? "btn-primary" : "btn-outline-primary")">Đã trả</a>
+            <a asp-action="Index" asp-route-status="overdue" class="btn btn-sm @(ViewBag.Status == "overdue" ? "btn-primary" : "btn-outline-primary")">Quá hạn</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Người mượn</th>
+                    <th>Sách</th>
+                    <th>Mã bản sao</th>
+                    <th>Ngày mượn</th>
+                    <th>Hạn trả</th>
+                    <th>Ngày trả</th>
+                    <th>Phạt</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var borrow in Model)
+                {
+                    <tr>
+                        <td>@borrow.BorrowID</td>
+                        <td>@borrow.User?.FullName</td>
+                        <td>@borrow.BookCopy?.Book?.Title</td>
+                        <td>@borrow.BookCopy?.CopyCode</td>
+                        <td>@borrow.BorrowDate.ToString("dd/MM/yyyy")</td>
+                        <td>@borrow.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>@(borrow.ReturnDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td>
+                            @if (borrow.FineAmount > 0)
+                            {
+                                <span class="badge bg-danger">@borrow.FineAmount.ToString("N0") VNĐ</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">0 VNĐ</span>
+                            }
+                        </td>
+                        <td>
+                            @if (borrow.IsReturned)
+                            {
+                                <span class="badge bg-success">Đã trả</span>
+                            }
+                            else if (borrow.DueDate < DateTime.Now.Date)
+                            {
+                                <span class="badge bg-danger">Quá hạn</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Đang mượn</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-info">Chi tiết</a>
+                            @if (!borrow.IsReturned)
+                            {
+                                <form asp-action="Return" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@borrow.BorrowID" />
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Xác nhận trả sách?');">Trả</button>
+                                </form>
+                                <form asp-action="Renew" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@borrow.BorrowID" />
+                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận gia hạn?');">Gia hạn</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

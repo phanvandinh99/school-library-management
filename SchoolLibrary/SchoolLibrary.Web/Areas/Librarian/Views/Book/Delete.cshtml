@@ -1,0 +1,49 @@
+@model SchoolLibrary.Web.Models.Book
+@{
+    ViewData["Title"] = "Xóa Sách";
+}
+
+<div class="content-box">
+    <h2>Xóa Sách</h2>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Cảnh báo!</strong> Bạn có chắc chắn muốn xóa sách này?
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">Tên sách:</dt>
+                <dd class="col-sm-9">@Model.Title</dd>
+
+                <dt class="col-sm-3">Tác giả:</dt>
+                <dd class="col-sm-9">@Model.Author</dd>
+
+                <dt class="col-sm-3">ISBN:</dt>
+                <dd class="col-sm-9">@Model.ISBN</dd>
+
+                <dt class="col-sm-3">Danh mục:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Category != null)
+                    {
+                        <span class="badge bg-info">@Model.Category.CategoryName</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Chưa phân loại</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Tổng số bản sao:</dt>
+                <dd class="col-sm-9">@Model.TotalCopies</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="BookID" />
+                <button type="submit" class="btn btn-danger">Xóa</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "Tổng quan Thống kê";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📋 Tổng quan Hệ thống</h2>
+
+    <!-- Overall Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h1 class="text-primary">@ViewBag.TotalUsers</h1>
+                    <p class="mb-0">Người dùng</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h1 class="text-info">@ViewBag.TotalBooks</h1>
+                    <p class="mb-0">Đầu sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h1 class="text-success">@ViewBag.TotalBorrows</h1>
+                    <p class="mb-0">Lượt mượn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h1 class="text-warning">@ViewBag.TotalCategories</h1>
+                    <p class="mb-0">Thể loại</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h2 class="text-danger">@ViewBag.TotalActiveBorrows</h2>
+                    <p class="mb-0">Sách đang mượn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h2 class="text-danger">@ViewBag.OverdueBooks</h2>
+                    <p class="mb-0">Sách quá hạn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Books by Category -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📚 Sách theo Thể loại</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Thể loại</th>
+                                    <th>Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.BooksByCategory)
+                                {
+                                    <tr>
+                                        <td>@item.CategoryName</td>
+                                        <td><span class="badge bg-primary">@item.Count sách</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users by Role -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>👥 Người dùng theo Vai trò</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Vai trò</th>
+                                    <th>Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.UsersByRole)
+                                {
+                                    <tr>
+                                        <td>@item.RoleName</td>
+                                        <td><span class="badge bg-success">@item.Count người</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-primary btn-lg">← Quay lại Báo cáo</a>
+    </div>
+</div>
+

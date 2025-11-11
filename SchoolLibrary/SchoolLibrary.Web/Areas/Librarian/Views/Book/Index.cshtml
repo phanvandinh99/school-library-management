@@ -1,0 +1,64 @@
+@model IEnumerable<SchoolLibrary.Web.Models.Book>
+@{
+    ViewData["Title"] = "Quản lý Sách";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📖 Quản lý Sách</h2>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <a asp-action="Create" class="btn btn-success">
+            ➕ Thêm sách mới
+        </a>
+        <form asp-action="Index" method="get" class="d-flex">
+            <input type="text" name="searchTerm" class="form-control me-2" placeholder="Tìm kiếm sách..." value="@ViewBag.SearchTerm" />
+            <button type="submit" class="btn btn-primary">🔍 Tìm</button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>ISBN</th>
+                    <th>Danh mục</th>
+                    <th>Số bản sao</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td>@book.BookID</td>
+                        <td>@book.Title</td>
+                        <td>@book.Author</td>
+                        <td>@book.ISBN</td>
+                        <td>
+                            @if (book.Category != null)
+                            {
+                                <span class="badge bg-info">@book.Category.CategoryName</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Chưa phân loại</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">@book.TotalCopies</span>
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@book.BookID" class="btn btn-sm btn-info">Chi tiết</a>
+                            <a asp-action="Edit" asp-route-id="@book.BookID" class="btn btn-sm btn-warning">Sửa</a>
+                            <a asp-action="Delete" asp-route-id="@book.BookID" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa sách này?');">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

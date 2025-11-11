@@ -1,0 +1,79 @@
+@model SchoolLibrary.Web.Models.BorrowRecord
+@{
+    ViewData["Title"] = "Chi tiết Mượn/Trả";
+}
+
+<div class="content-box">
+    <h2>Chi tiết Mượn/Trả</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-4">ID:</dt>
+                <dd class="col-sm-8">@Model.BorrowID</dd>
+
+                <dt class="col-sm-4">Người mượn:</dt>
+                <dd class="col-sm-8">@Model.User?.FullName</dd>
+
+                <dt class="col-sm-4">Sách:</dt>
+                <dd class="col-sm-8">@Model.BookCopy?.Book?.Title</dd>
+
+                <dt class="col-sm-4">Mã bản sao:</dt>
+                <dd class="col-sm-8">@Model.BookCopy?.CopyCode</dd>
+
+                <dt class="col-sm-4">Ngày mượn:</dt>
+                <dd class="col-sm-8">@Model.BorrowDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4">Hạn trả:</dt>
+                <dd class="col-sm-8">@Model.DueDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4">Ngày trả:</dt>
+                <dd class="col-sm-8">@(Model.ReturnDate?.ToString("dd/MM/yyyy") ?? "Chưa trả")</dd>
+
+                <dt class="col-sm-4">Trạng thái:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.IsReturned)
+                    {
+                        <span class="badge bg-success">Đã trả</span>
+                    }
+                    else if (Model.DueDate < DateTime.Now.Date)
+                    {
+                        <span class="badge bg-danger">Quá hạn</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Đang mượn</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-4">Tiền phạt:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.FineAmount > 0)
+                    {
+                        <span class="badge bg-danger">@Model.FineAmount.ToString("N0") VNĐ</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">0 VNĐ</span>
+                    }
+                </dd>
+            </dl>
+
+            <div class="mb-3">
+                @if (!Model.IsReturned)
+                {
+                    <form asp-action="Return" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@Model.BorrowID" />
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Xác nhận trả sách?');">Trả sách</button>
+                    </form>
+                    <form asp-action="Renew" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@Model.BorrowID" />
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Xác nhận gia hạn?');">Gia hạn</button>
+                    </form>
+                }
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+

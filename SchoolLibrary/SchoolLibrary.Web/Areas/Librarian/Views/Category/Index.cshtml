@@ -1,0 +1,44 @@
+@model IEnumerable<SchoolLibrary.Web.Models.Category>
+@{
+    ViewData["Title"] = "Quản lý Danh mục";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📑 Quản lý Danh mục</h2>
+
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">
+            ➕ Thêm danh mục mới
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên danh mục</th>
+                    <th>Số sách</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.CategoryID</td>
+                        <td>@category.CategoryName</td>
+                        <td>
+                            <span class="badge bg-primary">@category.Books.Count</span>
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@category.CategoryID" class="btn btn-sm btn-warning">Sửa</a>
+                            <a asp-action="Delete" asp-route-id="@category.CategoryID" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?');">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

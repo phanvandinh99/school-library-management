@@ -273,29 +273,25 @@
             <span class="role-badge">@Context.Session.GetString("Role")</span>
         </div>
         <nav class="flex-column">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" 
-               asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Home" asp-action="Index">
                 🏠 Dashboard
             </a>
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserManagement" ? "active" : "")" 
-               asp-area="Admin" asp-controller="UserManagement" asp-action="Index">
-                👥 Quản lý Người dùng
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Book" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Book" asp-action="Index">
+                📖 Quản lý Sách
             </a>
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "SystemConfiguration" ? "active" : "")" 
-               asp-area="Admin" asp-controller="SystemConfiguration" asp-action="Index">
-                ⚙️ Cấu hình Hệ thống
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Category" asp-action="Index">
+                📑 Quản lý Danh mục
             </a>
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "ActivityMonitor" ? "active" : "")" 
-               asp-area="Admin" asp-controller="ActivityMonitor" asp-action="Index">
-                📊 Giám sát Hoạt động
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Borrow" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Borrow" asp-action="Index">
+                📋 Mượn/Trả Sách
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reports" ? "active" : "")" 
-               asp-area="Admin" asp-controller="Reports" asp-action="Index">
-                📈 Báo cáo & Thống kê
-            </a>
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Backup" ? "active" : "")" 
-               asp-area="Admin" asp-controller="Backup" asp-action="Index">
-                💾 Sao lưu & Phục hồi
+               asp-area="Librarian" asp-controller="Reports" asp-action="Index">
+                📊 Báo cáo & Thống kê
             </a>
         </nav>
         <div class="sidebar-footer">

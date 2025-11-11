@@ -1,0 +1,93 @@
+@model SchoolLibrary.Web.Models.Book
+@{
+    ViewData["Title"] = "Chi tiết Sách";
+}
+
+<div class="content-box">
+    <h2>Chi tiết Sách</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">Tên sách:</dt>
+                <dd class="col-sm-9">@Model.Title</dd>
+
+                <dt class="col-sm-3">Tác giả:</dt>
+                <dd class="col-sm-9">@Model.Author</dd>
+
+                <dt class="col-sm-3">ISBN:</dt>
+                <dd class="col-sm-9">@Model.ISBN</dd>
+
+                <dt class="col-sm-3">Nhà xuất bản:</dt>
+                <dd class="col-sm-9">@Model.Publisher</dd>
+
+                <dt class="col-sm-3">Năm xuất bản:</dt>
+                <dd class="col-sm-9">@Model.PublishYear</dd>
+
+                <dt class="col-sm-3">Danh mục:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Category != null)
+                    {
+                        <span class="badge bg-info">@Model.Category.CategoryName</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Chưa phân loại</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Tổng số bản sao:</dt>
+                <dd class="col-sm-9">@Model.TotalCopies</dd>
+
+                <dt class="col-sm-3">Bản sao có sẵn:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-success">@ViewBag.AvailableCopies</span>
+                </dd>
+
+                <dt class="col-sm-3">Bản sao đang mượn:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-warning">@ViewBag.BorrowedCopies</span>
+                </dd>
+            </dl>
+
+            <div class="mb-3">
+                <a asp-action="Edit" asp-route-id="@Model.BookID" class="btn btn-warning">Sửa</a>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </div>
+
+            @if (Model.BookCopies != null && Model.BookCopies.Any())
+            {
+                <h4 class="mt-4">Danh sách bản sao:</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mã bản sao</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var copy in Model.BookCopies)
+                            {
+                                <tr>
+                                    <td>@copy.CopyCode</td>
+                                    <td>
+                                        @if (copy.Status == "Available")
+                                        {
+                                            <span class="badge bg-success">Có sẵn</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Đang mượn</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

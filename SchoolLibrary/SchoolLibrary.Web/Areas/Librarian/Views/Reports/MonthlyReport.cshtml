@@ -1,0 +1,152 @@
+@{
+    ViewData["Title"] = "Báo cáo Tháng";
+    var borrows = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.Borrows;
+    var returns = (List<SchoolLibrary.Web.Models.BorrowRecord>)ViewBag.Returns;
+    var userActivity = (dynamic)ViewBag.UserActivity;
+}
+
+<div class="content-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📅 Báo cáo Tháng: @ViewBag.MonthStart - @ViewBag.MonthEnd</h2>
+        <a asp-action="Index" class="btn btn-secondary">← Quay lại</a>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="year" class="form-label">Năm</label>
+                    <select name="year" id="year" class="form-control">
+                        @for (int y = DateTime.Now.Year - 2; y <= DateTime.Now.Year + 1; y++)
+                        {
+                            <option value="@y" selected="@(y == ViewBag.Year)">@y</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="month" class="form-label">Tháng</label>
+                    <select name="month" id="month" class="form-control">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(m == ViewBag.Month)">Tháng @m</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block">Xem báo cáo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@borrows.Count</h3>
+                    <p class="mb-0">Lượt mượn sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@returns.Count</h3>
+                    <p class="mb-0">Lượt trả sách</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@borrows.Count(x => !x.IsReturned)</h3>
+                    <p class="mb-0">Đang mượn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    @if (userActivity != null && userActivity.Count > 0)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>👥 Top 20 Người dùng hoạt động</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Họ tên</th>
+                                <th>Vai trò</th>
+                                <th>Số lần mượn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{int idx = 1;}
+                            @foreach (var item in userActivity)
+                            {
+                                <tr>
+                                    <td>@idx</td>
+                                    <td>@item.UserName</td>
+                                    <td><span class="badge bg-info">@item.Role</span></td>
+                                    <td><span class="badge bg-primary">@item.BorrowCount lần</span></td>
+                                </tr>
+                                idx++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Recent Borrows -->
+    <div class="card">
+        <div class="card-header">
+            <h5>📚 Chi tiết Mượn Sách</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Người mượn</th>
+                            <th>Sách</th>
+                            <th>Hạn trả</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in borrows)
+                        {
+                            <tr>
+                                <td>@record.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                <td>@record.User?.FullName</td>
+                                <td>@record.BookCopy?.Book?.Title</td>
+                                <td>@record.DueDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (record.IsReturned)
+                                    {
+                                        <span class="badge bg-success">Đã trả</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Đang mượn</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

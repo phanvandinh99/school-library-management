@@ -1,0 +1,71 @@
+@model SchoolLibrary.Web.Models.Book
+@{
+    ViewData["Title"] = "Sửa Sách";
+}
+
+<div class="content-box">
+    <h2>Sửa Sách</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="BookID" />
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Tên sách *</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Author" class="form-label">Tác giả</label>
+                    <input asp-for="Author" class="form-control" />
+                    <span asp-validation-for="Author" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ISBN" class="form-label">ISBN</label>
+                    <input asp-for="ISBN" class="form-control" />
+                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Publisher" class="form-label">Nhà xuất bản</label>
+                    <input asp-for="Publisher" class="form-control" />
+                    <span asp-validation-for="Publisher" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PublishYear" class="form-label">Năm xuất bản</label>
+                    <input asp-for="PublishYear" type="number" class="form-control" />
+                    <span asp-validation-for="PublishYear" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryID" class="form-label">Danh mục</label>
+                    <select asp-for="CategoryID" asp-items="ViewBag.Categories" class="form-control">
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                    <span asp-validation-for="CategoryID" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TotalCopies" class="form-label">Tổng số bản sao</label>
+                    <input asp-for="TotalCopies" type="number" class="form-control" min="1" />
+                    <span asp-validation-for="TotalCopies" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

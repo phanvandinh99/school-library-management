@@ -1,0 +1,40 @@
+@model SchoolLibrary.Web.Models.Category
+@{
+    ViewData["Title"] = "Xóa Danh mục";
+}
+
+<div class="content-box">
+    <h2>Xóa Danh mục</h2>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Cảnh báo!</strong> Bạn có chắc chắn muốn xóa danh mục này?
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row">
+                <dt class="col-sm-4">Tên danh mục:</dt>
+                <dd class="col-sm-8">@Model.CategoryName</dd>
+
+                <dt class="col-sm-4">Số sách:</dt>
+                <dd class="col-sm-8">
+                    <span class="badge bg-primary">@Model.Books.Count</span>
+                </dd>
+            </dl>
+
+            @if (Model.Books.Any())
+            {
+                <div class="alert alert-danger">
+                    <strong>Không thể xóa!</strong> Danh mục này có @Model.Books.Count cuốn sách. Vui lòng xóa hoặc chuyển sách sang danh mục khác trước.
+                </div>
+            }
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="CategoryID" />
+                <button type="submit" class="btn btn-danger" @(Model.Books.Any() ? "disabled" : "")>Xóa</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+

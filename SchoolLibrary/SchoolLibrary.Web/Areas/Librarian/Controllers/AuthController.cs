@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace SchoolLibrary.Web.Areas.Admin.Controllers
+namespace SchoolLibrary.Web.Areas.Librarian.Controllers
 {
-    [Area("Admin")]
+    [Area("Librarian")]
     public class AuthController : Controller
     {
         // GET: Login - Redirect về trang login chung
