@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Tra cứu Sách";
+}
+
+<div class="content-box">
+    <h2>🔍 Tra cứu Sách</h2>
+    
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Tìm kiếm theo tên, tác giả, ISBN..." value="@ViewBag.SearchTerm" />
+            </div>
+            <div class="col-md-4">
+                <select name="categoryId" class="form-select">
+                    <option value="">Tất cả thể loại</option>
+                    @foreach (var category in ViewBag.Categories as List<Category>)
+                    {
+                        <option value="@category.CategoryID" selected="@(ViewBag.CategoryId != null && ViewBag.CategoryId == category.CategoryID)">@category.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">🔍 Tìm kiếm</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Book.Title</h5>
+                        <p class="card-text">
+                            <strong>Tác giả:</strong> @(item.Book.Author ?? "Chưa có")<br />
+                            <strong>Thể loại:</strong> @(item.Book.Category?.CategoryName ?? "Chưa phân loại")<br />
+                            <strong>ISBN:</strong> @(item.Book.ISBN ?? "N/A")
+                        </p>
+                        <p>
+                            <span class="badge bg-success">Có sẵn: @item.AvailableCopies</span>
+                            <span class="badge bg-secondary">Tổng: @item.TotalCopies</span>
+                        </p>
+                        <a href="@Url.Action("Details", new { id = item.Book.BookID })" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <strong>Không tìm thấy sách nào!</strong> Vui lòng thử lại với từ khóa khác.
+        </div>
+    }
+</div>
+

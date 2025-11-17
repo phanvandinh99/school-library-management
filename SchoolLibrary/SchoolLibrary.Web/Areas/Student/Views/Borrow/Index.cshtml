@@ -1,0 +1,70 @@
+@model List<BorrowRecord>
+@{
+    ViewData["Title"] = "Lịch sử Mượn";
+}
+
+<div class="content-box">
+    <h2>📖 Lịch sử Mượn Sách</h2>
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên sách</th>
+                    <th>Ngày mượn</th>
+                    <th>Hạn trả</th>
+                    <th>Ngày trả</th>
+                    <th>Trạng thái</th>
+                    <th>Tiền phạt</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model)
+                {
+                    <tr>
+                        <td>@record.BookCopy?.Book?.Title</td>
+                        <td>@record.BorrowDate.ToString("dd/MM/yyyy")</td>
+                        <td>@record.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>@(record.ReturnDate?.ToString("dd/MM/yyyy") ?? "Chưa trả")</td>
+                        <td>
+                            @if (record.IsReturned)
+                            {
+                                <span class="badge bg-success">Đã trả</span>
+                            }
+                            else if (record.DueDate < DateTime.Now)
+                            {
+                                <span class="badge bg-danger">Quá hạn</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Đang mượn</span>
+                            }
+                        </td>
+                        <td>
+                            @if (record.FineAmount > 0)
+                            {
+                                <span class="text-danger">@record.FineAmount.ToString("N0") VNĐ</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Details", new { id = record.BorrowID })" class="btn btn-sm btn-info">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <strong>Bạn chưa mượn sách nào!</strong>
+        </div>
+    }
+</div>
+

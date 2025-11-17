@@ -1,0 +1,69 @@
+@model List<BookSuggestion>
+@{
+    ViewData["Title"] = "Đề xuất Mua sách";
+}
+
+<div class="content-box">
+    <h2>💡 Đề xuất Mua sách</h2>
+    
+    <div class="mb-3">
+        <a href="@Url.Action("Create")" class="btn btn-primary">+ Thêm đề xuất mới</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>ISBN</th>
+                    <th>Lý do</th>
+                    <th>Ngày đề xuất</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var suggestion in Model)
+                {
+                    <tr>
+                        <td>@suggestion.BookTitle</td>
+                        <td>@(suggestion.Author ?? "N/A")</td>
+                        <td>@(suggestion.ISBN ?? "N/A")</td>
+                        <td>@(suggestion.Reason ?? "Không có")</td>
+                        <td>@suggestion.SuggestionDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @switch (suggestion.Status)
+                            {
+                                case "Pending":
+                                    <span class="badge bg-warning">Đang chờ</span>
+                                    break;
+                                case "Approved":
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                    break;
+                                case "Rejected":
+                                    <span class="badge bg-danger">Từ chối</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@suggestion.Status</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Details", new { id = suggestion.SuggestionID })" class="btn btn-sm btn-info">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <strong>Bạn chưa có đề xuất nào!</strong> 
+            <a href="@Url.Action("Create")" class="alert-link">Tạo đề xuất mới</a>
+        </div>
+    }
+</div>
+

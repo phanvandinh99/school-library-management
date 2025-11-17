@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý Thư viện Trường THPT</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            background: linear-gradient(180deg, #11998e 0%, #38ef7d 100%);
+            padding: 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar .sidebar-brand {
+            padding: 30px 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.1);
+        }
+
+        .sidebar .sidebar-brand h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .sidebar .sidebar-brand .role-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .sidebar nav {
+            padding: 20px 0;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.9);
+            padding: 14px 25px;
+            margin: 2px 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .sidebar-footer .user-info {
+            color: white;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .sidebar-footer .user-info strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-footer .user-info small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-footer .btn-logout {
+            width: 100%;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-footer .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .content-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .content-box h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #11998e;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .table thead th {
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+
+        /* Animation */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-box {
+            animation: fadeIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h3>📚 Thư viện</h3>
+            <span class="role-badge">@Context.Session.GetString("Role")</span>
+        </div>
+        <nav class="flex-column">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" 
+               asp-area="Student" asp-controller="Home" asp-action="Index">
+                🏠 Dashboard
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Book" ? "active" : "")" 
+               asp-area="Student" asp-controller="Book" asp-action="Index">
+                🔍 Tra cứu Sách
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Borrow" ? "active" : "")" 
+               asp-area="Student" asp-controller="Borrow" asp-action="Index">
+                📖 Lịch sử Mượn
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservation" ? "active" : "")" 
+               asp-area="Student" asp-controller="Reservation" asp-action="Index">
+                📋 Đặt trước Sách
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Suggestion" ? "active" : "")" 
+               asp-area="Student" asp-controller="Suggestion" asp-action="Index">
+                💡 Đề xuất Mua sách
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <strong>@Context.Session.GetString("FullName")</strong>
+                <small>@Context.Session.GetString("Username")</small>
+            </div>
+            <form asp-controller="Auth" asp-action="Logout" asp-area="" method="post" class="d-inline">
+                <button type="submit" class="btn btn-logout">🚪 Đăng xuất</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>✓ Thành công!</strong> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>✗ Lỗi!</strong> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

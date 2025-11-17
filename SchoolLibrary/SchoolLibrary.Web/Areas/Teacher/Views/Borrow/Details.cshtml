@@ -1,0 +1,68 @@
+@model BorrowRecord
+@{
+    ViewData["Title"] = "Chi tiết Mượn Sách";
+}
+
+<div class="content-box">
+    <h2>📖 Chi tiết Mượn Sách</h2>
+    
+    <table class="table">
+        <tr>
+            <th width="200">Tên sách:</th>
+            <td>@Model.BookCopy?.Book?.Title</td>
+        </tr>
+        <tr>
+            <th>Tác giả:</th>
+            <td>@(Model.BookCopy?.Book?.Author ?? "Chưa có")</td>
+        </tr>
+        <tr>
+            <th>Mã bản sao:</th>
+            <td>@Model.BookCopy?.CopyCode</td>
+        </tr>
+        <tr>
+            <th>Ngày mượn:</th>
+            <td>@Model.BorrowDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Hạn trả:</th>
+            <td>@Model.DueDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Ngày trả:</th>
+            <td>@(Model.ReturnDate?.ToString("dd/MM/yyyy") ?? "Chưa trả")</td>
+        </tr>
+        <tr>
+            <th>Trạng thái:</th>
+            <td>
+                @if (Model.IsReturned)
+                {
+                    <span class="badge bg-success">Đã trả</span>
+                }
+                else if (Model.DueDate < DateTime.Now)
+                {
+                    <span class="badge bg-danger">Quá hạn</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning">Đang mượn</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>Tiền phạt:</th>
+            <td>
+                @if (Model.FineAmount > 0)
+                {
+                    <span class="text-danger">@Model.FineAmount.ToString("N0") VNĐ</span>
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </td>
+        </tr>
+    </table>
+
+    <a href="@Url.Action("Index")" class="btn btn-secondary">← Quay lại</a>
+</div>
+

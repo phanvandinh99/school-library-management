@@ -1,0 +1,58 @@
+@model BookSuggestion
+@{
+    ViewData["Title"] = "Chi tiết Đề xuất";
+}
+
+<div class="content-box">
+    <h2>💡 Chi tiết Đề xuất Mua sách</h2>
+    
+    <table class="table">
+        <tr>
+            <th width="200">Tên sách:</th>
+            <td>@Model.BookTitle</td>
+        </tr>
+        <tr>
+            <th>Tác giả:</th>
+            <td>@(Model.Author ?? "Chưa có")</td>
+        </tr>
+        <tr>
+            <th>ISBN:</th>
+            <td>@(Model.ISBN ?? "N/A")</td>
+        </tr>
+        <tr>
+            <th>Lý do đề xuất:</th>
+            <td>@(Model.Reason ?? "Không có")</td>
+        </tr>
+        <tr>
+            <th>Ngày đề xuất:</th>
+            <td>@Model.SuggestionDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Ngày xem xét:</th>
+            <td>@(Model.ReviewedDate?.ToString("dd/MM/yyyy") ?? "Chưa xem xét")</td>
+        </tr>
+        <tr>
+            <th>Trạng thái:</th>
+            <td>
+                @switch (Model.Status)
+                {
+                    case "Pending":
+                        <span class="badge bg-warning">Đang chờ</span>
+                        break;
+                    case "Approved":
+                        <span class="badge bg-success">Đã duyệt</span>
+                        break;
+                    case "Rejected":
+                        <span class="badge bg-danger">Từ chối</span>
+                        break;
+                    default:
+                        <span class="badge bg-secondary">@Model.Status</span>
+                        break;
+                }
+            </td>
+        </tr>
+    </table>
+
+    <a href="@Url.Action("Index")" class="btn btn-secondary">← Quay lại</a>
+</div>
+

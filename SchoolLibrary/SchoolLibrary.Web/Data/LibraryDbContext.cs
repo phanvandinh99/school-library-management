@@ -18,6 +18,8 @@ namespace SchoolLibrary.Web.Data
         public DbSet<BookCopy> BookCopies { get; set; }
         public DbSet<BorrowRecord> BorrowRecords { get; set; }
         public DbSet<SystemSettings> SystemSettings { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<BookSuggestion> BookSuggestions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +61,34 @@ namespace SchoolLibrary.Web.Data
                 .WithMany(bc => bc.BorrowRecords)
                 .HasForeignKey(br => br.CopyID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Reservations -> User
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Reservations -> Book
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Book)
+                .WithMany()
+                .HasForeignKey(r => r.BookID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // BookSuggestions -> User
+            modelBuilder.Entity<BookSuggestion>()
+                .HasOne(bs => bs.User)
+                .WithMany()
+                .HasForeignKey(bs => bs.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Explicit table name mapping để đảm bảo EF tìm đúng bảng
+            modelBuilder.Entity<Reservation>()
+                .ToTable("Reservations");
+            
+            modelBuilder.Entity<BookSuggestion>()
+                .ToTable("BookSuggestions");
 
             // Configure unique constraints
             modelBuilder.Entity<Role>()
@@ -102,6 +132,14 @@ namespace SchoolLibrary.Web.Data
                 .Property(br => br.FineAmount)
                 .HasDefaultValue(0)
                 .HasColumnType("decimal(10,2)");
+
+            modelBuilder.Entity<Reservation>()
+                .Property(r => r.Status)
+                .HasDefaultValue("Pending");
+
+            modelBuilder.Entity<BookSuggestion>()
+                .Property(bs => bs.Status)
+                .HasDefaultValue("Pending");
         }
     }
 }

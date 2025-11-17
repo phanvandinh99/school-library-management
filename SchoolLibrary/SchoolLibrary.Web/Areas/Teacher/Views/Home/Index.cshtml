@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Dashboard - Giáo viên";
+}
+
+<div class="content-box">
+    <h2>📊 Dashboard</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">📖 Đang mượn</h5>
+                    <h2 class="text-primary">@Model.TotalBorrowed</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">✅ Đã trả</h5>
+                    <h2 class="text-success">@Model.TotalReturned</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">⚠️ Quá hạn</h5>
+                    <h2 class="text-danger">@Model.OverdueBooks</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Đặt trước</h5>
+                    <h2 class="text-info">@Model.ActiveReservations</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-3">📚 Sách đã mượn gần đây</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên sách</th>
+                    <th>Ngày mượn</th>
+                    <th>Hạn trả</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var borrow in Model.RecentBorrows)
+                {
+                    <tr>
+                        <td>@borrow.BookCopy?.Book?.Title</td>
+                        <td>@borrow.BorrowDate.ToString("dd/MM/yyyy")</td>
+                        <td>@borrow.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (borrow.IsReturned)
+                            {
+                                <span class="badge bg-success">Đã trả</span>
+                            }
+                            else if (borrow.DueDate < DateTime.Now)
+                            {
+                                <span class="badge bg-danger">Quá hạn</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Đang mượn</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,46 @@
+@model BookSuggestion
+@{
+    ViewData["Title"] = "Đề xuất Mua sách";
+}
+
+<div class="content-box">
+    <h2>💡 Đề xuất Mua sách</h2>
+    
+    <form method="post" asp-action="Create">
+        @Html.AntiForgeryToken()
+        
+        <div class="mb-3">
+            <label asp-for="BookTitle" class="form-label">Tên sách <span class="text-danger">*</span></label>
+            <input asp-for="BookTitle" class="form-control" required />
+            <span asp-validation-for="BookTitle" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Author" class="form-label">Tác giả</label>
+            <input asp-for="Author" class="form-control" />
+            <span asp-validation-for="Author" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ISBN" class="form-label">ISBN</label>
+            <input asp-for="ISBN" class="form-control" />
+            <span asp-validation-for="ISBN" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Reason" class="form-label">Lý do đề xuất</label>
+            <textarea asp-for="Reason" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Reason" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Gửi đề xuất</button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

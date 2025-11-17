@@ -1,0 +1,76 @@
+@model Book
+@{
+    ViewData["Title"] = "Chi tiết Sách";
+}
+
+<div class="content-box">
+    <h2>📖 Chi tiết Sách</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table">
+                <tr>
+                    <th width="200">Tên sách:</th>
+                    <td>@Model.Title</td>
+                </tr>
+                <tr>
+                    <th>Tác giả:</th>
+                    <td>@(Model.Author ?? "Chưa có")</td>
+                </tr>
+                <tr>
+                    <th>ISBN:</th>
+                    <td>@(Model.ISBN ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>Nhà xuất bản:</th>
+                    <td>@(Model.Publisher ?? "Chưa có")</td>
+                </tr>
+                <tr>
+                    <th>Năm xuất bản:</th>
+                    <td>@(Model.PublishYear?.ToString() ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>Thể loại:</th>
+                    <td>@(Model.Category?.CategoryName ?? "Chưa phân loại")</td>
+                </tr>
+                <tr>
+                    <th>Số bản có sẵn:</th>
+                    <td>
+                        <span class="badge bg-success">@ViewBag.AvailableCopies</span> / 
+                        <span class="badge bg-secondary">@Model.TotalCopies</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        @if (ViewBag.HasReservation == true)
+        {
+            <div class="alert alert-info">
+                Bạn đã đặt trước cuốn sách này rồi!
+            </div>
+        }
+        else if (ViewBag.AvailableCopies > 0)
+        {
+            <form method="post" asp-action="Create" asp-controller="Reservation" asp-area="Student">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookId" value="@Model.BookID" />
+                <button type="submit" class="btn btn-primary">📋 Đặt trước sách</button>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                Hiện tại không có sách có sẵn. Bạn có thể đặt trước để nhận thông báo khi có sách.
+            </div>
+            <form method="post" asp-action="Create" asp-controller="Reservation" asp-area="Student">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookId" value="@Model.BookID" />
+                <button type="submit" class="btn btn-primary">📋 Đặt trước sách</button>
+            </form>
+        }
+        <a href="@Url.Action("Index")" class="btn btn-secondary">← Quay lại</a>
+    </div>
+</div>
+
