@@ -28,11 +28,32 @@
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background animation */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+            top: -50%;
+            left: -50%;
+        }
+
+        keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .login-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
             animation: fadeInUp 0.6s ease-out;
         }
 
@@ -57,44 +78,38 @@
         .login-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 30px;
+            padding: 25px 30px;
             text-align: center;
             position: relative;
         }
 
-        .login-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
+        .library-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
         }
 
-        keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+        keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
         .login-header h1 {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .login-header p {
-            font-size: 16px;
+            font-size: 13px;
             opacity: 0.9;
-            position: relative;
-            z-index: 1;
+            font-weight: 400;
         }
 
         .login-body {
-            padding: 40px 35px;
+            padding: 35px 30px;
         }
 
         .form-label {
@@ -115,6 +130,30 @@
         .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+
+        .input-group-icon {
+            position: relative;
+        }
+
+        .input-group-icon::before {
+            content: '👤';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .input-group-icon input {
+            padding-left: 45px;
+        }
+
+        .input-group-icon.password::before {
+            content: '🔒';
         }
 
         .btn-login {
@@ -128,6 +167,7 @@
             width: 100%;
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 5px;
         }
 
         .btn-login:hover {
@@ -144,30 +184,54 @@
             border-color: #667eea;
         }
 
+        .form-check-label {
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+        }
+
         .text-danger {
             font-size: 13px;
             margin-top: 5px;
+            display: block;
         }
 
         .alert {
             border-radius: 10px;
             border: none;
             margin-bottom: 20px;
-        }
-
-        .library-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            display: block;
-            position: relative;
-            z-index: 1;
+            font-size: 14px;
         }
 
         .footer-text {
             text-align: center;
-            margin-top: 30px;
-            color: rgba(255,255,255,0.8);
-            font-size: 14px;
+            margin-top: 25px;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        /* Responsive */
+        media (max-width: 480px) {
+            .login-header {
+                padding: 20px 25px;
+            }
+
+            .login-header h1 {
+                font-size: 20px;
+            }
+
+            .login-header p {
+                font-size: 12px;
+            }
+
+            .login-body {
+                padding: 30px 25px;
+            }
+
+            .library-icon {
+                font-size: 35px;
+            }
         }
     </style>
 </head>
@@ -180,24 +244,28 @@
                 <p>Hệ thống Quản lý Thư viện</p>
             </div>
             <div class="login-body">
-                <form asp-action="Login" method="post">
+                <form asp-action="Login" method="post" id="loginForm">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                     
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label asp-for="Username" class="form-label">Tên đăng nhập</label>
-                        <input asp-for="Username" class="form-control" placeholder="Nhập tên đăng nhập" autofocus />
+                        <div class="input-group-icon">
+                            <input asp-for="Username" class="form-control" placeholder="Nhập tên đăng nhập" id="usernameInput" autofocus />
+                        </div>
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label asp-for="Password" class="form-label">Mật khẩu</label>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                        <div class="input-group-icon password">
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                        </div>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
                     <div class="mb-4 form-check">
-                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
-                        <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe" />
+                        <label asp-for="RememberMe" class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
                     </div>
 
                     <input type="hidden" asp-for="ReturnUrl" />
@@ -209,7 +277,7 @@
             </div>
         </div>
         <div class="footer-text">
-            © 2024 Hệ thống Quản lý Thư viện
+            © 2025 Hệ thống Quản lý Thư viện
         </div>
     </div>
 
@@ -217,6 +285,25 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Đảm bảo focus vào ô username khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('usernameInput');
+            if (usernameInput) {
+                // Delay nhỏ để đảm bảo autofocus hoạt động
+                setTimeout(function() {
+                    usernameInput.focus();
+                }, 100);
+            }
+        });
+
+        // Enter key để submit form
+        document.getElementById('loginForm')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.submit();
+            }
+        });
+    </script>
 </body>
 </html>
-
