@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
+using System;
 
 namespace SchoolLibrary.Web.Areas.Student.Controllers
 {
@@ -42,10 +43,24 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            var suggestions = await _context.BookSuggestions
-                .Where(bs => bs.UserID == userId)
-                .OrderByDescending(bs => bs.SuggestionDate)
-                .ToListAsync();
+            List<BookSuggestion> suggestions;
+            try
+            {
+                suggestions = await _context.BookSuggestions
+                    .Where(bs => bs.UserID == userId)
+                    .OrderByDescending(bs => bs.SuggestionDate)
+                    .ToListAsync();
+            }
+            catch (SqlException ex) when (ex.Number == 208) // Invalid object name
+            {
+                TempData["ErrorMessage"] = "Bảng BookSuggestions chưa được tạo trong database. Vui lòng chạy script SQL để tạo bảng.";
+                suggestions = new List<BookSuggestion>();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message}";
+                suggestions = new List<BookSuggestion>();
+            }
 
             return View(suggestions);
         }
@@ -86,10 +101,23 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
             suggestion.SuggestionDate = DateTime.Now;
             suggestion.Status = "Pending";
 
-            _context.BookSuggestions.Add(suggestion);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.BookSuggestions.Add(suggestion);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đề xuất mua sách đã được gửi thành công!";
+            }
+            catch (SqlException ex) when (ex.Number == 208) // Invalid object name
+            {
+                TempData["ErrorMessage"] = "Bảng BookSuggestions chưa được tạo trong database. Vui lòng chạy script SQL để tạo bảng.";
+                return View(suggestion);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi lưu dữ liệu: {ex.Message}";
+                return View(suggestion);
+            }
 
-            TempData["SuccessMessage"] = "Đề xuất mua sách đã được gửi thành công!";
             return RedirectToAction("Index");
         }
 
@@ -112,9 +140,23 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            var suggestion = await _context.BookSuggestions
-                .Include(bs => bs.User)
-                .FirstOrDefaultAsync(bs => bs.SuggestionID == id && bs.UserID == userId);
+            BookSuggestion? suggestion;
+            try
+            {
+                suggestion = await _context.BookSuggestions
+                    .Include(bs => bs.User)
+                    .FirstOrDefaultAsync(bs => bs.SuggestionID == id && bs.UserID == userId);
+            }
+            catch (SqlException ex) when (ex.Number == 208) // Invalid object name
+            {
+                TempData["ErrorMessage"] = "Bảng BookSuggestions chưa được tạo trong database. Vui lòng chạy script SQL để tạo bảng.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message}";
+                return RedirectToAction("Index");
+            }
 
             if (suggestion == null)
             {

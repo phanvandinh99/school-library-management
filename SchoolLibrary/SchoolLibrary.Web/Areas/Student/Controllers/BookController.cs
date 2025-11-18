@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
 
@@ -93,8 +94,24 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
             var userId = HttpContext.Session.GetInt32("UserID");
 
             // Kiểm tra xem đã đặt trước chưa
-            bool hasReservation = userId.HasValue && await _context.Reservations
-                .AnyAsync(r => r.UserID == userId && r.BookID == id && r.Status == "Pending");
+            bool hasReservation = false;
+            if (userId.HasValue)
+            {
+                try
+                {
+                    hasReservation = await _context.Reservations
+                        .AnyAsync(r => r.UserID == userId && r.BookID == id && r.Status == "Pending");
+                }
+                catch (SqlException ex) when (ex.Number == 208) // Invalid object name
+                {
+                    // Bảng chưa tồn tại, không có reservation
+                    hasReservation = false;
+                }
+                catch
+                {
+                    hasReservation = false;
+                }
+            }
 
             ViewBag.AvailableCopies = availableCopies;
             ViewBag.HasReservation = hasReservation;

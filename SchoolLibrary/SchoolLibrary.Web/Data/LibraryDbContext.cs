@@ -62,6 +62,14 @@ namespace SchoolLibrary.Web.Data
                 .HasForeignKey(br => br.CopyID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Explicit table name mapping TRƯỚC khi configure relationships
+            // Đảm bảo EF biết đúng tên bảng từ đầu
+            modelBuilder.Entity<Reservation>()
+                .ToTable("Reservations", "dbo");
+            
+            modelBuilder.Entity<BookSuggestion>()
+                .ToTable("BookSuggestions", "dbo");
+
             // Reservations -> User
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.User)
@@ -82,13 +90,6 @@ namespace SchoolLibrary.Web.Data
                 .WithMany()
                 .HasForeignKey(bs => bs.UserID)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Explicit table name mapping để đảm bảo EF tìm đúng bảng
-            modelBuilder.Entity<Reservation>()
-                .ToTable("Reservations");
-            
-            modelBuilder.Entity<BookSuggestion>()
-                .ToTable("BookSuggestions");
 
             // Configure unique constraints
             modelBuilder.Entity<Role>()

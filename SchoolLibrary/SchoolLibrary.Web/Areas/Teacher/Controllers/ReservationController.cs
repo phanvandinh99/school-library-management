@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
+using System;
 
 namespace SchoolLibrary.Web.Areas.Teacher.Controllers
 {
@@ -42,12 +43,26 @@ namespace SchoolLibrary.Web.Areas.Teacher.Controllers
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            var reservations = await _context.Reservations
-                .Include(r => r.Book)
-                .ThenInclude(b => b.Category)
-                .Where(r => r.UserID == userId)
-                .OrderByDescending(r => r.ReservationDate)
-                .ToListAsync();
+            List<Reservation> reservations;
+            try
+            {
+                reservations = await _context.Reservations
+                    .Include(r => r.Book)
+                    .ThenInclude(b => b.Category)
+                    .Where(r => r.UserID == userId)
+                    .OrderByDescending(r => r.ReservationDate)
+                    .ToListAsync();
+            }
+            catch (SqlException ex) when (ex.Number == 208) // Invalid object name
+            {
+                TempData["ErrorMessage"] = "Bảng Reservations chưa được tạo trong database. Vui lòng chạy script SQL để tạo bảng.";
+                reservations = new List<Reservation>();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message}";
+                reservations = new List<Reservation>();
+            }
 
             return View(reservations);
         }

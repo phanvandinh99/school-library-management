@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SchoolLibrary.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,9 @@ builder.Services.AddSession(options =>
 // Configure DbContext with SQL Server
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LibraryDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+           .EnableSensitiveDataLogging() // Log SQL queries để debug
+           .LogTo(Console.WriteLine, LogLevel.Information)); // Log ra console
 
 var app = builder.Build();
 

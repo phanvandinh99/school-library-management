@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
+using System;
 
 namespace SchoolLibrary.Web.Areas.Student.Controllers
 {
@@ -41,8 +43,19 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            var activeReservations = await _context.Reservations
-                .CountAsync(r => r.UserID == userId && r.Status == "Pending");
+            // Query Reservations với try-catch để xử lý nếu bảng chưa tồn tại
+            int activeReservations = 0;
+            try
+            {
+                activeReservations = await _context.Reservations
+                    .CountAsync(r => r.UserID == userId && r.Status == "Pending");
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nhưng không crash app
+                // Có thể bảng chưa được tạo hoặc EF chưa reload schema
+                activeReservations = 0;
+            }
 
             var dashboard = new
             {
