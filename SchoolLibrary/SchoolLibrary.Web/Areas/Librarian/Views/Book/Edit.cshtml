@@ -19,21 +19,47 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Author" class="form-label">Tác giả</label>
-                    <input asp-for="Author" class="form-control" />
-                    <span asp-validation-for="Author" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="ISBN" class="form-label">ISBN</label>
                     <input asp-for="ISBN" class="form-control" />
                     <span asp-validation-for="ISBN" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Publisher" class="form-label">Nhà xuất bản</label>
-                    <input asp-for="Publisher" class="form-control" />
-                    <span asp-validation-for="Publisher" class="text-danger"></span>
+                    <label asp-for="PublisherID" class="form-label">Nhà xuất bản</label>
+                    <select asp-for="PublisherID" asp-items="ViewBag.Publishers" class="form-control">
+                        <option value="">-- Chọn nhà xuất bản --</option>
+                    </select>
+                    <span asp-validation-for="PublisherID" class="text-danger"></span>
+                    <small class="text-muted">Hoặc <a asp-controller="Publisher" asp-action="Create" target="_blank">thêm nhà xuất bản mới</a></small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tác giả <span class="text-muted">(có thể chọn nhiều)</span></label>
+                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        @if (ViewBag.Authors != null)
+                        {
+                            var selectedIds = ViewBag.SelectedAuthorIds as List<int> ?? new List<int>();
+                            @foreach (var author in (List<SchoolLibrary.Web.Models.Author>)ViewBag.Authors)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedAuthorIds" value="@author.AuthorID" id="author_@author.AuthorID" 
+                                           @(selectedIds.Contains(author.AuthorID) ? "checked" : "") />
+                                    <label class="form-check-label" for="author_@author.AuthorID">
+                                        @author.AuthorName
+                                        @if (!string.IsNullOrEmpty(author.Nationality))
+                                        {
+                                            <small class="text-muted">(@author.Nationality)</small>
+                                        }
+                                    </label>
+                                </div>
+                            }
+                        }
+                        @if (ViewBag.Authors == null || ((List<SchoolLibrary.Web.Models.Author>)ViewBag.Authors).Count == 0)
+                        {
+                            <p class="text-muted">Chưa có tác giả nào. <a asp-controller="Author" asp-action="Create" target="_blank">Thêm tác giả mới</a></p>
+                        }
+                    </div>
+                    <small class="text-muted">Có thể chọn nhiều tác giả cho một cuốn sách</small>
                 </div>
 
                 <div class="mb-3">

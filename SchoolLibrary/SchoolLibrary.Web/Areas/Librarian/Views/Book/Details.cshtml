@@ -13,13 +13,46 @@
                 <dd class="col-sm-9">@Model.Title</dd>
 
                 <dt class="col-sm-3">Tác giả:</dt>
-                <dd class="col-sm-9">@Model.Author</dd>
+                <dd class="col-sm-9">
+                    @if (Model.BookAuthors != null && Model.BookAuthors.Any())
+                    {
+                        <div>
+                            @foreach (var bookAuthor in Model.BookAuthors)
+                            {
+                                <span class="badge bg-primary me-1">
+                                    @(bookAuthor.Author?.AuthorName ?? "")
+                                </span>
+                            }
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.Author))
+                    {
+                        @Model.Author
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa có</span>
+                    }
+                </dd>
 
                 <dt class="col-sm-3">ISBN:</dt>
                 <dd class="col-sm-9">@Model.ISBN</dd>
 
                 <dt class="col-sm-3">Nhà xuất bản:</dt>
-                <dd class="col-sm-9">@Model.Publisher</dd>
+                <dd class="col-sm-9">
+                    @if (Model.PublisherEntity != null)
+                    {
+                        <span class="badge bg-info">@Model.PublisherEntity.PublisherName</span>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.Publisher))
+                    {
+                        @Model.Publisher
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa có</span>
+                    }
+                </dd>
 
                 <dt class="col-sm-3">Năm xuất bản:</dt>
                 <dd class="col-sm-9">@Model.PublishYear</dd>

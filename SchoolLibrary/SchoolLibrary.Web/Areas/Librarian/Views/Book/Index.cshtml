@@ -23,6 +23,7 @@
                     <th>ID</th>
                     <th>Tên sách</th>
                     <th>Tác giả</th>
+                    <th>Nhà xuất bản</th>
                     <th>ISBN</th>
                     <th>Danh mục</th>
                     <th>Số bản sao</th>
@@ -35,7 +36,34 @@
                     <tr>
                         <td>@book.BookID</td>
                         <td>@book.Title</td>
-                        <td>@book.Author</td>
+                        <td>
+                            @if (book.BookAuthors != null && book.BookAuthors.Any())
+                            {
+                                @string.Join(", ", book.BookAuthors.Select(ba => ba.Author?.AuthorName ?? "").Where(name => !string.IsNullOrEmpty(name)))
+                            }
+                            else if (!string.IsNullOrEmpty(book.Author))
+                            {
+                                @book.Author
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có</span>
+                            }
+                        </td>
+                        <td>
+                            @if (book.PublisherEntity != null)
+                            {
+                                @book.PublisherEntity.PublisherName
+                            }
+                            else if (!string.IsNullOrEmpty(book.Publisher))
+                            {
+                                @book.Publisher
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có</span>
+                            }
+                        </td>
                         <td>@book.ISBN</td>
                         <td>
                             @if (book.Category != null)

@@ -42,16 +42,45 @@ CREATE TABLE Categories (
     CategoryName NVARCHAR(100) NOT NULL UNIQUE
 );
 
+CREATE TABLE Publishers (
+    PublisherID INT PRIMARY KEY IDENTITY(1,1),
+    PublisherName NVARCHAR(255) NOT NULL,
+    Address NVARCHAR(500),
+    Email NVARCHAR(100),
+    Phone NVARCHAR(20),
+    Description NVARCHAR(500)
+);
+
+CREATE TABLE Authors (
+    AuthorID INT PRIMARY KEY IDENTITY(1,1),
+    AuthorName NVARCHAR(255) NOT NULL,
+    Biography NVARCHAR(500),
+    Nationality NVARCHAR(100),
+    BirthDate DATE,
+    Description NVARCHAR(500)
+);
+
 CREATE TABLE Books (
     BookID INT PRIMARY KEY IDENTITY(1,1),
     Title NVARCHAR(255) NOT NULL,
-    Author NVARCHAR(255),
+    Author NVARCHAR(255), -- Giữ lại để backward compatibility
     ISBN NVARCHAR(20),
-    Publisher NVARCHAR(100),
+    Publisher NVARCHAR(100), -- Giữ lại để backward compatibility
+    PublisherID INT, -- Foreign key đến Publishers
     PublishYear INT,
     CategoryID INT,
     TotalCopies INT DEFAULT 1,
-    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID),
+    FOREIGN KEY (PublisherID) REFERENCES Publishers(PublisherID)
+);
+
+CREATE TABLE BookAuthors (
+    BookAuthorID INT PRIMARY KEY IDENTITY(1,1),
+    BookID INT NOT NULL,
+    AuthorID INT NOT NULL,
+    FOREIGN KEY (BookID) REFERENCES Books(BookID) ON DELETE CASCADE,
+    FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID) ON DELETE CASCADE,
+    UNIQUE(BookID, AuthorID) -- Đảm bảo không có duplicate
 );
 
 CREATE TABLE BookCopies (
@@ -122,10 +151,32 @@ INSERT INTO Users (FullName, Username, PasswordHash, RoleID, ClassOrDepartment, 
 INSERT INTO Categories (CategoryName) VALUES
 (N'Văn học'), (N'Toán học'), (N'Vật lý'), (N'Lịch sử'), (N'Ngoại ngữ');
 
-INSERT INTO Books (Title, Author, ISBN, Publisher, PublishYear, CategoryID, TotalCopies) VALUES
-(N'Đại số 11', N'Đoàn Quỳnh', '978-604-0-12345-6', N'Giáo dục Việt Nam', 2020, 2, 3),
-(N'Vật lý 11', N'Lương Duyên Bình', '978-604-0-65432-1', N'Giáo dục Việt Nam', 2021, 3, 2),
-(N'Chiếc thuyền ngoài xa', N'Nguyễn Minh Châu', '978-604-2-98765-4', N'Giáo dục Việt Nam', 2019, 1, 5);
+INSERT INTO Publishers (PublisherName, Address, Email, Phone, Description) VALUES
+(N'Giáo dục Việt Nam', N'81 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội', 'contact@gdvn.vn', '02438220801', N'Nhà xuất bản giáo dục hàng đầu Việt Nam'),
+(N'Kim Đồng', N'55 Quang Trung, Nguyễn Du, Hai Bà Trưng, Hà Nội', 'info@kimdong.vn', '02439434730', N'Nhà xuất bản sách thiếu nhi'),
+(N'Trẻ', N'161B Lý Chính Thắng, Phường 7, Quận 3, TP.HCM', 'info@nxbtrẻ.com.vn', '02839316289', N'Nhà xuất bản sách văn học và giáo dục');
+
+INSERT INTO Authors (AuthorName, Biography, Nationality, BirthDate, Description) VALUES
+(N'Đoàn Quỳnh', N'Giáo sư Toán học, tác giả nhiều sách giáo khoa', N'Việt Nam', '1940-01-01', N'Chuyên gia về đại số và hình học'),
+(N'Lương Duyên Bình', N'Giáo sư Vật lý, tác giả sách giáo khoa Vật lý', N'Việt Nam', '1950-01-01', N'Chuyên gia về vật lý cơ bản'),
+(N'Nguyễn Minh Châu', N'Nhà văn nổi tiếng, tác giả nhiều tác phẩm văn học', N'Việt Nam', '1930-10-28', N'Tác giả của nhiều tác phẩm văn học nổi tiếng'),
+(N'Nguyễn Du', N'Đại thi hào dân tộc Việt Nam', N'Việt Nam', '1765-01-03', N'Tác giả Truyện Kiều'),
+(N'Nam Cao', N'Nhà văn hiện thực phê phán', N'Việt Nam', '1915-10-29', N'Tác giả Chí Phèo, Lão Hạc');
+
+INSERT INTO Books (Title, Author, ISBN, Publisher, PublisherID, PublishYear, CategoryID, TotalCopies) VALUES
+(N'Đại số 11', N'Đoàn Quỳnh', '978-604-0-12345-6', N'Giáo dục Việt Nam', 1, 2020, 2, 3),
+(N'Vật lý 11', N'Lương Duyên Bình', '978-604-0-65432-1', N'Giáo dục Việt Nam', 1, 2021, 3, 2),
+(N'Chiếc thuyền ngoài xa', N'Nguyễn Minh Châu', '978-604-2-98765-4', N'Giáo dục Việt Nam', 1, 2019, 1, 5),
+(N'Truyện Kiều', N'Nguyễn Du', '978-604-0-11111-1', N'Kim Đồng', 2, 2020, 1, 10),
+(N'Chí Phèo', N'Nam Cao', '978-604-0-22222-2', N'Trẻ', 3, 2021, 1, 8);
+
+-- Tạo quan hệ Many-to-Many giữa Books và Authors
+INSERT INTO BookAuthors (BookID, AuthorID) VALUES
+(1, 1), -- Đại số 11 - Đoàn Quỳnh
+(2, 2), -- Vật lý 11 - Lương Duyên Bình
+(3, 3), -- Chiếc thuyền ngoài xa - Nguyễn Minh Châu
+(4, 4), -- Truyện Kiều - Nguyễn Du
+(5, 5); -- Chí Phèo - Nam Cao
 
 INSERT INTO BookCopies (BookID, CopyCode, Status) VALUES
 (1, 'TOAN11-001', 'Available'), (1, 'TOAN11-002', 'Borrowed'), (1, 'TOAN11-003', 'Available'),

@@ -1,0 +1,35 @@
+@model SchoolLibrary.Web.Models.Author
+@{
+    ViewData["Title"] = "Xóa Tác giả";
+}
+
+<h2>Xóa Tác giả</h2>
+
+<h3>Bạn có chắc chắn muốn xóa tác giả này?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Tên tác giả:</dt>
+        <dd class="col-sm-9"><strong>@Model.AuthorName</strong></dd>
+
+        <dt class="col-sm-3">Số sách:</dt>
+        <dd class="col-sm-9">
+            <span class="badge bg-info">@(Model.BookAuthors?.Count ?? 0) cuốn</span>
+        </dd>
+    </dl>
+
+    @if (Model.BookAuthors != null && Model.BookAuthors.Any())
+    {
+        <div class="alert alert-warning">
+            <strong>Cảnh báo:</strong> Tác giả này đang có @Model.BookAuthors.Count cuốn sách. 
+            Không thể xóa nếu đang có sách sử dụng!
+        </div>
+    }
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="AuthorID" />
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>
+

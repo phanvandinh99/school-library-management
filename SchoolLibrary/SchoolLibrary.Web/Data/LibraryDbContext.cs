@@ -14,7 +14,10 @@ namespace SchoolLibrary.Web.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Publisher> Publishers { get; set; }
+        public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<BookAuthor> BookAuthors { get; set; }
         public DbSet<BookCopy> BookCopies { get; set; }
         public DbSet<BorrowRecord> BorrowRecords { get; set; }
         public DbSet<SystemSettings> SystemSettings { get; set; }
@@ -40,6 +43,32 @@ namespace SchoolLibrary.Web.Data
                 .WithMany(c => c.Books)
                 .HasForeignKey(b => b.CategoryID)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Books -> Publisher
+            modelBuilder.Entity<Book>()
+                .HasOne(b => b.PublisherEntity)
+                .WithMany(p => p.Books)
+                .HasForeignKey(b => b.PublisherID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // BookAuthors -> Book (Many-to-Many)
+            modelBuilder.Entity<BookAuthor>()
+                .HasOne(ba => ba.Book)
+                .WithMany(b => b.BookAuthors)
+                .HasForeignKey(ba => ba.BookID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // BookAuthors -> Author (Many-to-Many)
+            modelBuilder.Entity<BookAuthor>()
+                .HasOne(ba => ba.Author)
+                .WithMany(a => a.BookAuthors)
+                .HasForeignKey(ba => ba.AuthorID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique constraint cho BookAuthor (một tác giả không thể được gán 2 lần cho cùng 1 cuốn sách)
+            modelBuilder.Entity<BookAuthor>()
+                .HasIndex(ba => new { ba.BookID, ba.AuthorID })
+                .IsUnique();
 
             // BookCopies -> Book
             modelBuilder.Entity<BookCopy>()
@@ -111,6 +140,14 @@ namespace SchoolLibrary.Web.Data
 
             modelBuilder.Entity<SystemSettings>()
                 .HasIndex(s => s.SettingKey)
+                .IsUnique();
+
+            modelBuilder.Entity<Publisher>()
+                .HasIndex(p => p.PublisherName)
+                .IsUnique();
+
+            modelBuilder.Entity<Author>()
+                .HasIndex(a => a.AuthorName)
                 .IsUnique();
 
             // Configure default values

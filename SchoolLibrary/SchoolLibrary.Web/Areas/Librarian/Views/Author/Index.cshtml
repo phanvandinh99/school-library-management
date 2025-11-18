@@ -1,0 +1,63 @@
+@model IEnumerable<SchoolLibrary.Web.Models.Author>
+@{
+    ViewData["Title"] = "Quản lý Tác giả";
+}
+
+<h2 class="mb-4">Quản lý Tác giả</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Thêm tác giả mới
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên tác giả</th>
+                <th>Quốc tịch</th>
+                <th>Ngày sinh</th>
+                <th>Số sách</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var author in Model)
+            {
+                <tr>
+                    <td>@author.AuthorID</td>
+                    <td><strong>@author.AuthorName</strong></td>
+                    <td>@(author.Nationality ?? "-")</td>
+                    <td>@(author.BirthDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    <td>
+                        <span class="badge bg-info">@(author.BookAuthors?.Count ?? 0)</span>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@author.AuthorID" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@author.AuthorID" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@author.AuthorID" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -285,6 +285,14 @@
                asp-area="Librarian" asp-controller="Category" asp-action="Index">
                 📑 Quản lý Danh mục
             </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Publisher" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Publisher" asp-action="Index">
+                🏢 Quản lý Nhà xuất bản
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Author" ? "active" : "")" 
+               asp-area="Librarian" asp-controller="Author" asp-action="Index">
+                ✍️ Quản lý Tác giả
+            </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Borrow" ? "active" : "")" 
                asp-area="Librarian" asp-controller="Borrow" asp-action="Index">
                 📋 Mượn/Trả Sách

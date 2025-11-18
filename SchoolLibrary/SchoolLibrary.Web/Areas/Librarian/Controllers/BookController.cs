@@ -30,14 +30,21 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            var books = _context.Books.Include(b => b.Category).AsQueryable();
+            var books = _context.Books
+                .Include(b => b.Category)
+                .Include(b => b.PublisherEntity)
+                .Include(b => b.BookAuthors)
+                    .ThenInclude(ba => ba.Author)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 books = books.Where(b =>
                     b.Title.Contains(searchTerm) ||
-                    b.Author.Contains(searchTerm) ||
-                    b.ISBN.Contains(searchTerm));
+                    (b.Author != null && b.Author.Contains(searchTerm)) ||
+                    (b.ISBN != null && b.ISBN.Contains(searchTerm)) ||
+                    (b.PublisherEntity != null && b.PublisherEntity.PublisherName.Contains(searchTerm)) ||
+                    b.BookAuthors.Any(ba => ba.Author != null && ba.Author.AuthorName.Contains(searchTerm)));
             }
 
             var bookList = await books
@@ -68,6 +75,9 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
 
             var book = await _context.Books
                 .Include(b => b.Category)
+                .Include(b => b.PublisherEntity)
+                .Include(b => b.BookAuthors)
+                    .ThenInclude(ba => ba.Author)
                 .Include(b => b.BookCopies)
                 .FirstOrDefaultAsync(b => b.BookID == id);
 
@@ -91,13 +101,15 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             }
 
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryID", "CategoryName");
+            ViewBag.Publishers = new SelectList(await _context.Publishers.OrderBy(p => p.PublisherName).ToListAsync(), "PublisherID", "PublisherName");
+            ViewBag.Authors = await _context.Authors.OrderBy(a => a.AuthorName).ToListAsync();
             return View();
         }
 
         // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Book book, int numberOfCopies = 1)
+        public async Task<IActionResult> Create(Book book, int numberOfCopies = 1, int[]? selectedAuthorIds = null)
         {
             if (!IsLibrarian())
             {
@@ -108,6 +120,20 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             {
                 _context.Add(book);
                 await _context.SaveChangesAsync();
+
+                // Thêm các tác giả được chọn
+                if (selectedAuthorIds != null && selectedAuthorIds.Length > 0)
+                {
+                    foreach (var authorId in selectedAuthorIds)
+                    {
+                        var bookAuthor = new BookAuthor
+                        {
+                            BookID = book.BookID,
+                            AuthorID = authorId
+                        };
+                        _context.BookAuthors.Add(bookAuthor);
+                    }
+                }
 
                 // Tạo các bản sao sách
                 for (int i = 1; i <= numberOfCopies; i++)
@@ -127,6 +153,8 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             }
 
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryID", "CategoryName", book.CategoryID);
+            ViewBag.Publishers = new SelectList(await _context.Publishers.OrderBy(p => p.PublisherName).ToListAsync(), "PublisherID", "PublisherName", book.PublisherID);
+            ViewBag.Authors = await _context.Authors.OrderBy(a => a.AuthorName).ToListAsync();
             return View(book);
         }
 
@@ -143,20 +171,26 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .Include(b => b.BookAuthors)
+                .FirstOrDefaultAsync(b => b.BookID == id);
+            
             if (book == null)
             {
                 return NotFound();
             }
 
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryID", "CategoryName", book.CategoryID);
+            ViewBag.Publishers = new SelectList(await _context.Publishers.OrderBy(p => p.PublisherName).ToListAsync(), "PublisherID", "PublisherName", book.PublisherID);
+            ViewBag.Authors = await _context.Authors.OrderBy(a => a.AuthorName).ToListAsync();
+            ViewBag.SelectedAuthorIds = book.BookAuthors.Select(ba => ba.AuthorID).ToList();
             return View(book);
         }
 
         // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Book book)
+        public async Task<IActionResult> Edit(int id, Book book, int[]? selectedAuthorIds = null)
         {
             if (!IsLibrarian())
             {
@@ -172,7 +206,29 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             {
                 try
                 {
+                    // Cập nhật thông tin sách
                     _context.Update(book);
+
+                    // Xóa các BookAuthors cũ
+                    var existingBookAuthors = await _context.BookAuthors
+                        .Where(ba => ba.BookID == id)
+                        .ToListAsync();
+                    _context.BookAuthors.RemoveRange(existingBookAuthors);
+
+                    // Thêm các tác giả mới được chọn
+                    if (selectedAuthorIds != null && selectedAuthorIds.Length > 0)
+                    {
+                        foreach (var authorId in selectedAuthorIds)
+                        {
+                            var bookAuthor = new BookAuthor
+                            {
+                                BookID = book.BookID,
+                                AuthorID = authorId
+                            };
+                            _context.BookAuthors.Add(bookAuthor);
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Cập nhật sách thành công!";
                 }
@@ -188,6 +244,9 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             }
 
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryID", "CategoryName", book.CategoryID);
+            ViewBag.Publishers = new SelectList(await _context.Publishers.OrderBy(p => p.PublisherName).ToListAsync(), "PublisherID", "PublisherName", book.PublisherID);
+            ViewBag.Authors = await _context.Authors.OrderBy(a => a.AuthorName).ToListAsync();
+            ViewBag.SelectedAuthorIds = selectedAuthorIds?.ToList() ?? new List<int>();
             return View(book);
         }
 

@@ -1,0 +1,52 @@
+@model SchoolLibrary.Web.Models.Publisher
+@{
+    ViewData["Title"] = "Chi tiết Nhà xuất bản";
+}
+
+<h2>Chi tiết Nhà xuất bản</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">ID:</dt>
+            <dd class="col-sm-9">@Model.PublisherID</dd>
+
+            <dt class="col-sm-3">Tên nhà xuất bản:</dt>
+            <dd class="col-sm-9"><strong>@Model.PublisherName</strong></dd>
+
+            <dt class="col-sm-3">Địa chỉ:</dt>
+            <dd class="col-sm-9">@(Model.Address ?? "-")</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@(Model.Email ?? "-")</dd>
+
+            <dt class="col-sm-3">Điện thoại:</dt>
+            <dd class="col-sm-9">@(Model.Phone ?? "-")</dd>
+
+            <dt class="col-sm-3">Mô tả:</dt>
+            <dd class="col-sm-9">@(Model.Description ?? "-")</dd>
+
+            <dt class="col-sm-3">Số sách:</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-info">@(Model.Books?.Count ?? 0) cuốn</span>
+            </dd>
+        </dl>
+
+        @if (Model.Books != null && Model.Books.Any())
+        {
+            <h4 class="mt-4">Danh sách sách:</h4>
+            <ul>
+                @foreach (var book in Model.Books)
+                {
+                    <li>@book.Title</li>
+                }
+            </ul>
+        }
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.PublisherID" class="btn btn-warning">Sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+
