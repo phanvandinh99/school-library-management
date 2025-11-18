@@ -64,11 +64,12 @@ namespace SchoolLibrary.Web.Data
 
             // Explicit table name mapping TRƯỚC khi configure relationships
             // Đảm bảo EF biết đúng tên bảng từ đầu
+            // Không chỉ định schema để EF tự động dùng schema mặc định
             modelBuilder.Entity<Reservation>()
-                .ToTable("Reservations", "dbo");
+                .ToTable("Reservations");
             
             modelBuilder.Entity<BookSuggestion>()
-                .ToTable("BookSuggestions", "dbo");
+                .ToTable("BookSuggestions");
 
             // Reservations -> User
             modelBuilder.Entity<Reservation>()

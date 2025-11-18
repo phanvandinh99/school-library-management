@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
 using System;
@@ -11,10 +12,12 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
     public class SuggestionController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly ILogger<SuggestionController> _logger;
 
-        public SuggestionController(LibraryDbContext context)
+        public SuggestionController(LibraryDbContext context, ILogger<SuggestionController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // Kiểm tra quyền Student
@@ -53,12 +56,35 @@ namespace SchoolLibrary.Web.Areas.Student.Controllers
             }
             catch (SqlException ex) when (ex.Number == 208) // Invalid object name
             {
-                TempData["ErrorMessage"] = "Bảng BookSuggestions chưa được tạo trong database. Vui lòng chạy script SQL để tạo bảng.";
+                // Log chi tiết lỗi
+                var conn = _context.Database.GetDbConnection();
+                var dbName = conn.Database ?? "Unknown";
+                var server = conn.DataSource ?? "Unknown";
+                
+                _logger.LogError(ex, 
+                    "SQL Error 208 - Invalid object name 'BookSuggestions'. " +
+                    "Database: {Database}, Server: {Server}, " +
+                    "Error Number: {Number}, State: {State}, Class: {Class}, " +
+                    "Message: {Message}",
+                    dbName, server, ex.Number, ex.State, ex.Class, ex.Message);
+
+                var errorDetails = $"Database: {dbName}, Server: {server}, " +
+                                 $"Error: {ex.Message} (Number: {ex.Number}, State: {ex.State}, Class: {ex.Class})";
+                
+                TempData["ErrorMessage"] = $"✗ Lỗi! Bảng BookSuggestions không tìm thấy. Chi tiết: {errorDetails}";
                 suggestions = new List<BookSuggestion>();
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message}";
+                var conn = _context.Database.GetDbConnection();
+                var dbName = conn.Database ?? "Unknown";
+                var server = conn.DataSource ?? "Unknown";
+                
+                _logger.LogError(ex, 
+                    "Error loading suggestions. Database: {Database}, Server: {Server}",
+                    dbName, server);
+                
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message} (Database: {dbName}, Server: {server})";
                 suggestions = new List<BookSuggestion>();
             }
 
