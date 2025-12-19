@@ -7,9 +7,14 @@
     <h2 class="mb-4">📋 Mượn/Trả Sách</h2>
 
     <div class="mb-3 d-flex justify-content-between align-items-center">
-        <a asp-action="Borrow" class="btn btn-success">
-            ➕ Mượn sách mới
-        </a>
+        <div>
+            <a asp-action="Borrow" class="btn btn-success">
+                ➕ Mượn sách mới
+            </a>
+            <a asp-action="BorrowRequests" class="btn btn-warning">
+                📝 Yêu cầu mượn sách
+            </a>
+        </div>
         <div>
             <a asp-action="Index" asp-route-status="" class="btn btn-sm @(ViewBag.Status == null ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
             <a asp-action="Index" asp-route-status="active" class="btn btn-sm @(ViewBag.Status == "active" ? "btn-primary" : "btn-outline-primary")">Đang mượn</a>

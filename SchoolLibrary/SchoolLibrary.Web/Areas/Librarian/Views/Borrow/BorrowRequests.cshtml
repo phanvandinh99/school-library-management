@@ -1,0 +1,116 @@
+@model IEnumerable<SchoolLibrary.Web.Models.Reservation>
+@{
+    ViewData["Title"] = "Yêu cầu Mượn Sách";
+}
+
+<div class="content-box">
+    <h2 class="mb-4">📝 Yêu cầu Mượn Sách</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-secondary">← Quay lại Mượn/Trả Sách</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Không có yêu cầu mượn sách nào đang chờ phê duyệt.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Người yêu cầu</th>
+                        <th>Sách</th>
+                        <th>Ngày yêu cầu</th>
+                        <th>Số sách đang mượn</th>
+                        <th>Số bản có sẵn</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model)
+                    {
+                        <tr>
+                            <td>@request.ReservationID</td>
+                            <td>
+                                <strong>@request.User?.FullName</strong><br>
+                                <small class="text-muted">@request.User?.Username</small>
+                            </td>
+                            <td>
+                                <strong>@request.Book?.Title</strong><br>
+                                @if (!string.IsNullOrEmpty(request.Book?.ISBN))
+                                {
+                                    <small class="text-muted">ISBN: @request.Book.ISBN</small>
+                                }
+                            </td>
+                            <td>@request.ReservationDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @{
+                                    var currentBorrows = ViewBag.CurrentBorrows != null && ViewBag.CurrentBorrows.ContainsKey(request.ReservationID) 
+                                        ? ViewBag.CurrentBorrows[request.ReservationID] : 0;
+                                }
+                                <span class="badge bg-info">@currentBorrows</span>
+                            </td>
+                            <td>
+                                @{
+                                    var availableCopies = ViewBag.AvailableCopies != null && ViewBag.AvailableCopies.ContainsKey(request.ReservationID)
+                                        ? ViewBag.AvailableCopies[request.ReservationID] : 0;
+                                }
+                                @if (availableCopies > 0)
+                                {
+                                    <span class="badge bg-success">@availableCopies bản</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Không có sẵn</span>
+                                }
+                            </td>
+                            <td>
+                                @if (availableCopies > 0)
+                                {
+                                    <form method="post" asp-action="ApproveBorrow" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="reservationId" value="@request.ReservationID" />
+                                        <button type="submit" class="btn btn-success btn-sm" 
+                                                onclick="return confirm('Bạn có chắc chắn muốn phê duyệt yêu cầu mượn sách này?');">
+                                            ✅ Phê duyệt
+                                        </button>
+                                    </form>
+                                }
+                                <form method="post" asp-action="RejectBorrow" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="reservationId" value="@request.ReservationID" />
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu mượn sách này?');">
+                                        ❌ Từ chối
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+

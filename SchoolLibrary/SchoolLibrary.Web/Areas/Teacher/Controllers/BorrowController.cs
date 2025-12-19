@@ -27,6 +27,82 @@ namespace SchoolLibrary.Web.Areas.Teacher.Controllers
             return HttpContext.Session.GetInt32("UserID");
         }
 
+        private async Task<int> GetDefaultBorrowDays()
+        {
+            var setting = await _context.SystemSettings
+                .FirstOrDefaultAsync(s => s.SettingKey == "DefaultBorrowDays");
+            return setting != null && int.TryParse(setting.SettingValue, out int days) ? days : 14;
+        }
+
+        private async Task<int> GetMaxBorrowBooks()
+        {
+            var setting = await _context.SystemSettings
+                .FirstOrDefaultAsync(s => s.SettingKey == "MaxBorrowBooks");
+            return setting != null && int.TryParse(setting.SettingValue, out int max) ? max : 5;
+        }
+
+        // POST: Borrow - Gửi yêu cầu mượn sách (cần thủ thư phê duyệt)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Borrow(int bookId)
+        {
+            if (!IsTeacher())
+            {
+                return RedirectToAction("Login", "Auth", new { area = "" });
+            }
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth", new { area = "" });
+            }
+
+            // Kiểm tra số sách đang mượn
+            var currentBorrows = await _context.BorrowRecords
+                .CountAsync(br => br.UserID == userId && !br.IsReturned);
+
+            var maxBorrows = await GetMaxBorrowBooks();
+            if (currentBorrows >= maxBorrows)
+            {
+                TempData["ErrorMessage"] = $"Bạn đã mượn tối đa {maxBorrows} cuốn sách!";
+                return RedirectToAction("Details", "Book", new { id = bookId });
+            }
+
+            // Kiểm tra sách có tồn tại không
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null)
+            {
+                TempData["ErrorMessage"] = "Sách không tồn tại!";
+                return RedirectToAction("Details", "Book", new { id = bookId });
+            }
+
+            // Kiểm tra đã có yêu cầu mượn chưa
+            var existingRequest = await _context.Reservations
+                .FirstOrDefaultAsync(r => r.UserID == userId && r.BookID == bookId && r.Status == "BorrowRequest");
+
+            if (existingRequest != null)
+            {
+                TempData["ErrorMessage"] = "Bạn đã gửi yêu cầu mượn sách này rồi! Vui lòng chờ thủ thư phê duyệt.";
+                return RedirectToAction("Details", "Book", new { id = bookId });
+            }
+
+            // Tạo yêu cầu mượn sách (Reservation với status "BorrowRequest")
+            var reservation = new Reservation
+            {
+                UserID = userId.Value,
+                BookID = bookId,
+                ReservationDate = DateTime.Now,
+                ExpiryDate = null, // Chưa có hạn khi chưa được phê duyệt
+                Status = "BorrowRequest" // Phân biệt với "Pending" (đặt trước)
+            };
+
+            _context.Reservations.Add(reservation);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã gửi yêu cầu mượn sách! Vui lòng chờ thủ thư phê duyệt.";
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Borrow History
         public async Task<IActionResult> Index()
         {

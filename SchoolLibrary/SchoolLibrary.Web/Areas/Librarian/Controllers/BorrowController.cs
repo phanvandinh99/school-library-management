@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolLibrary.Web.Data;
 using SchoolLibrary.Web.Models;
+using System.Collections.Generic;
 
 namespace SchoolLibrary.Web.Areas.Librarian.Controllers
 {
@@ -256,6 +257,136 @@ namespace SchoolLibrary.Web.Areas.Librarian.Controllers
             }
 
             return View(borrowRecord);
+        }
+
+        // GET: BorrowRequests - Danh sách yêu cầu mượn sách
+        public async Task<IActionResult> BorrowRequests()
+        {
+            if (!IsLibrarian())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var requests = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .ThenInclude(b => b.BookCopies)
+                .Where(r => r.Status == "BorrowRequest")
+                .OrderByDescending(r => r.ReservationDate)
+                .ToListAsync();
+
+            // Tính số sách đang mượn và số bản có sẵn cho mỗi yêu cầu
+            var currentBorrowsDict = new Dictionary<int, int>();
+            var availableCopiesDict = new Dictionary<int, int>();
+
+            foreach (var request in requests)
+            {
+                var currentBorrows = await _context.BorrowRecords
+                    .CountAsync(br => br.UserID == request.UserID && !br.IsReturned);
+                currentBorrowsDict[request.ReservationID] = currentBorrows;
+
+                var availableCopies = request.Book?.BookCopies?.Count(bc => bc.Status == "Available") ?? 0;
+                availableCopiesDict[request.ReservationID] = availableCopies;
+            }
+
+            ViewBag.CurrentBorrows = currentBorrowsDict;
+            ViewBag.AvailableCopies = availableCopiesDict;
+
+            return View(requests);
+        }
+
+        // POST: ApproveBorrow - Phê duyệt yêu cầu mượn sách
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveBorrow(int reservationId)
+        {
+            if (!IsLibrarian())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var reservation = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .ThenInclude(b => b.BookCopies)
+                .FirstOrDefaultAsync(r => r.ReservationID == reservationId && r.Status == "BorrowRequest");
+
+            if (reservation == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy yêu cầu mượn sách!";
+                return RedirectToAction(nameof(BorrowRequests));
+            }
+
+            // Kiểm tra số sách đang mượn
+            var currentBorrows = await _context.BorrowRecords
+                .CountAsync(br => br.UserID == reservation.UserID && !br.IsReturned);
+
+            var maxBorrows = await GetMaxBorrowBooks();
+            if (currentBorrows >= maxBorrows)
+            {
+                TempData["ErrorMessage"] = $"Người dùng đã mượn tối đa {maxBorrows} cuốn sách!";
+                return RedirectToAction(nameof(BorrowRequests));
+            }
+
+            // Tìm bản sao sách có sẵn
+            var availableCopy = reservation.Book.BookCopies
+                .FirstOrDefault(bc => bc.Status == "Available");
+
+            if (availableCopy == null)
+            {
+                TempData["ErrorMessage"] = "Sách không còn sẵn để mượn!";
+                return RedirectToAction(nameof(BorrowRequests));
+            }
+
+            // Tạo BorrowRecord
+            var defaultDays = await GetDefaultBorrowDays();
+            var borrowRecord = new BorrowRecord
+            {
+                UserID = reservation.UserID,
+                CopyID = availableCopy.CopyID,
+                BorrowDate = DateTime.Now,
+                DueDate = DateTime.Now.AddDays(defaultDays),
+                IsReturned = false,
+                FineAmount = 0
+            };
+
+            // Cập nhật trạng thái sách
+            availableCopy.Status = "Borrowed";
+            
+            // Xóa hoặc cập nhật Reservation
+            reservation.Status = "Approved";
+            
+            _context.BorrowRecords.Add(borrowRecord);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã phê duyệt yêu cầu mượn sách! Hạn trả: {borrowRecord.DueDate:dd/MM/yyyy}";
+            return RedirectToAction(nameof(BorrowRequests));
+        }
+
+        // POST: RejectBorrow - Từ chối yêu cầu mượn sách
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectBorrow(int reservationId)
+        {
+            if (!IsLibrarian())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var reservation = await _context.Reservations
+                .FirstOrDefaultAsync(r => r.ReservationID == reservationId && r.Status == "BorrowRequest");
+
+            if (reservation == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy yêu cầu mượn sách!";
+                return RedirectToAction(nameof(BorrowRequests));
+            }
+
+            reservation.Status = "Rejected";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã từ chối yêu cầu mượn sách!";
+            return RedirectToAction(nameof(BorrowRequests));
         }
     }
 }

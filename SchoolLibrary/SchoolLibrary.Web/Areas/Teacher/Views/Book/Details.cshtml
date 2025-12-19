@@ -53,11 +53,18 @@
         }
         else if (ViewBag.AvailableCopies > 0)
         {
-            <form method="post" asp-action="Create" asp-controller="Reservation" asp-area="Teacher">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="bookId" value="@Model.BookID" />
-                <button type="submit" class="btn btn-primary">📋 Đặt trước sách</button>
-            </form>
+            <div class="d-flex gap-2">
+                <form method="post" asp-action="Borrow" asp-controller="Borrow" asp-area="Teacher" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="bookId" value="@Model.BookID" />
+                    <button type="submit" class="btn btn-success">📚 Mượn sách ngay</button>
+                </form>
+                <form method="post" asp-action="Create" asp-controller="Reservation" asp-area="Teacher" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="bookId" value="@Model.BookID" />
+                    <button type="submit" class="btn btn-primary">📋 Đặt trước sách</button>
+                </form>
+            </div>
         }
         else
         {
@@ -70,7 +77,9 @@
                 <button type="submit" class="btn btn-primary">📋 Đặt trước sách</button>
             </form>
         }
-        <a href="@Url.Action("Index")" class="btn btn-secondary">← Quay lại</a>
+        <div class="mt-2">
+            <a href="@Url.Action("Index")" class="btn btn-secondary">← Quay lại</a>
+        </div>
     </div>
 </div>
 
