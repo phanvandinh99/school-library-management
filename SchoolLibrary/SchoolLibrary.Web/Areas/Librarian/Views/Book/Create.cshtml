@@ -34,12 +34,15 @@
 
                 <div class="mb-3">
                     <label class="form-label">Tác giả <span class="text-muted">(có thể chọn nhiều)</span></label>
-                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                    <div class="mb-2">
+                        <input type="text" id="authorSearch" class="form-control" placeholder="🔍 Tìm kiếm tác giả theo tên..." />
+                    </div>
+                    <div class="border rounded p-3" id="authorList" style="max-height: 200px; overflow-y: auto;">
                         @if (ViewBag.Authors != null)
                         {
                             @foreach (var author in (List<SchoolLibrary.Web.Models.Author>)ViewBag.Authors)
                             {
-                                <div class="form-check">
+                                <div class="form-check author-item" data-author-name="@author.AuthorName">
                                     <input class="form-check-input" type="checkbox" name="selectedAuthorIds" value="@author.AuthorID" id="author_@author.AuthorID" />
                                     <label class="form-check-label" for="author_@author.AuthorID">
                                         @author.AuthorName
@@ -56,7 +59,7 @@
                             <p class="text-muted">Chưa có tác giả nào. <a asp-controller="Author" asp-action="Create" target="_blank">Thêm tác giả mới</a></p>
                         }
                     </div>
-                    <small class="text-muted">Có thể chọn nhiều tác giả cho một cuốn sách</small>
+                    <small class="text-muted">Có thể chọn nhiều tác giả cho một cuốn sách. <a asp-controller="Author" asp-action="Create" target="_blank">Thêm tác giả mới</a></small>
                 </div>
 
                 <div class="mb-3">
@@ -90,5 +93,44 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('authorSearch');
+            const authorItems = document.querySelectorAll('.author-item');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    
+                    authorItems.forEach(function(item) {
+                        const authorName = item.getAttribute('data-author-name').toLowerCase();
+                        if (authorName.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Hiển thị thông báo nếu không tìm thấy
+                    const visibleItems = Array.from(authorItems).filter(item => item.style.display !== 'none');
+                    let noResultsMsg = document.getElementById('noResultsMsg');
+                    
+                    if (visibleItems.length === 0 && searchTerm !== '') {
+                        if (!noResultsMsg) {
+                            noResultsMsg = document.createElement('p');
+                            noResultsMsg.id = 'noResultsMsg';
+                            noResultsMsg.className = 'text-muted text-center mt-2';
+                            noResultsMsg.textContent = 'Không tìm thấy tác giả nào.';
+                            document.getElementById('authorList').appendChild(noResultsMsg);
+                        }
+                    } else {
+                        if (noResultsMsg) {
+                            noResultsMsg.remove();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 }
 
